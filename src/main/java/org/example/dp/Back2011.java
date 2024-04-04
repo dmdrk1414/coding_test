@@ -29,17 +29,29 @@ public class Back2011 {
   public static void main(String[] args) {
     input();
     int MOD = 1000000;
+    dp[0] = 1;
     dp[1] = 1;
 
-    for (int i = 2; i < length; i++) {
-      int subNumber = Integer.parseInt((arr[i - 1] + arr[i]));
-      dp[i] = dp[i - 1] % MOD;
-      if (subNumber >= 1 && subNumber <= 26) {
-        dp[i] = dp[i - 2] + dp[i] % MOD;
+    if (arr[0] == "0") {
+      System.out.println(0);
+    }
+
+    for (int i = 2; i <= length; i++) {
+      if (arr[i-1] == "0") {
+        if (arr[i - 2] == "1" || arr[i - 2] == "2") {
+          dp[i] = dp[i - 2] % MOD;
+        }
+      } else {
+        int subNumber = Integer.parseInt((arr[i - 2] + arr[i - 1]));
+//      System.out.println("subNumber = " + subNumber);
+        dp[i] = dp[i - 1] % MOD;
+        if (subNumber >= 1 && subNumber <= 26) {
+          dp[i] = dp[i - 2] + dp[i - 1] % MOD;
+        }
       }
     }
 //    System.out.println(Arrays.toString(dp));
-    System.out.println(dp[length - 1]);
+    System.out.println(dp[length]);
   }
 
 
