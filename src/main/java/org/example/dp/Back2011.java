@@ -13,45 +13,52 @@ public class Back2011 {
 
   static StringBuilder sb = new StringBuilder();
   static String str;
-  static String[] arr;
   static String[] selected; // 선택한 것들을 넣는다.
   static int[] dp;
   static int length;
+  static int MOD = 1000000;
 
   static void input() {
     FastReader scan = new FastReader();
     str = scan.nextLine();
-    arr = str.split("");
-    length = arr.length;
-    dp = new int[length+ 1];
+//    str = "27";
+    length = str.length();
+    dp = new int[length + 1];
   }
 
-  public static void main(String[] args) {
-    input();
-    int MOD = 1000000;
-    dp[0] = 1;
-    dp[1] = 1;
-
-    if (arr[0] == "0") {
-      System.out.println(0);
+  public static int dp() {
+    if (str.charAt(0) == '0') {
+      return 0;
     }
 
     for (int i = 2; i <= length; i++) {
-      if (arr[i-1] == "0") {
-        if (arr[i - 2] == "1" || arr[i - 2] == "2") {
+      if (str.charAt(i - 1) == '0') {
+        if (str.charAt(i - 2) == '1' || str.charAt(i - 2) == '2') {
           dp[i] = dp[i - 2] % MOD;
         }
       } else {
-        int subNumber = Integer.parseInt((arr[i - 2] + arr[i - 1]));
-//      System.out.println("subNumber = " + subNumber);
+        if (str.charAt(i - 2) == '0') {
+          dp[i] = dp[i - 1] % MOD;
+          continue;
+        }
+        int subNumber = Integer.parseInt(
+            String.valueOf(str.charAt(i - 2)) + String.valueOf(str.charAt(i - 1)));
         dp[i] = dp[i - 1] % MOD;
         if (subNumber >= 1 && subNumber <= 26) {
           dp[i] = dp[i - 2] + dp[i - 1] % MOD;
         }
       }
     }
-//    System.out.println(Arrays.toString(dp));
-    System.out.println(dp[length]);
+
+    return dp[length];
+  }
+
+  public static void main(String[] args) {
+    input();
+    dp[0] = 1;
+    dp[1] = 1;
+
+    System.out.println(dp());
   }
 
 
