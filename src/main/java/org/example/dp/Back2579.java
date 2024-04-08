@@ -43,23 +43,27 @@ public class Back2579 {
 
   public static void main(String[] args) {
     input();
+    int before_o = 1;
+    int before_x = 0;
 
     if (N == 1) {
       System.out.println(step[1]);
     } else if (N == 2) {
       System.out.println(step[1] + step[2]);
     } else {
-      dp[1][0] = step[1];
-      dp[2][0] = step[2];
-      dp[1][1] = step[1];
-      dp[2][1] = step[1] + step[2];
+      dp[1][before_x] = step[1];
+      dp[2][before_x] = step[2];
+      dp[1][before_o] = step[1];
+      dp[2][before_o] = step[1] + step[2];
 
+      // 1은 이전 X
+      // 0은 이전 O
       for (int i = 3; i <= N; i++) {
-        dp[i][0] = Math.max(dp[i - 2][1] + step[i], dp[i - 2][0] + step[i]);
-        dp[i][1] = dp[i - 1][0] + step[i];
+        dp[i][before_o] = dp[i - 1][before_x] + step[i];
+        dp[i][before_x] = Math.max(dp[i - 2][before_o] + step[i], dp[i - 2][before_x] + step[i]);
       }
 
-      System.out.println(Math.max(dp[N][1], dp[N][0]));
+      System.out.println(Math.max(dp[N][before_x], dp[N][before_o]));
     }
   }
 
