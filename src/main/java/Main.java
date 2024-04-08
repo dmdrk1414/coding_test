@@ -19,6 +19,7 @@ public class Main {
         }
       }
     }
+    
     int result = 0;
     for (int i = 0; i <= 9; i++) {
       result += dp[n - 1][i];
