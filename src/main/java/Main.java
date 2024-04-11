@@ -22,7 +22,7 @@ public class Main {
     input();
     run();
     System.out.print(answer);
-    
+
   }
 
   public static void input() throws IOException {
@@ -35,6 +35,7 @@ public class Main {
       }
       ary.add(op);
     }
+    
     size = ary.size();
     dp = new int[5][5][size]; // dp 배열 : 왼쪽발, 오른쪽발, 입력받은 명령의 수
     for (int i = 0; i < 5; i++) {
