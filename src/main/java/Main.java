@@ -35,12 +35,13 @@ public class Main {
       }
       ary.add(op);
     }
-    
+
     size = ary.size();
     dp = new int[5][5][size]; // dp 배열 : 왼쪽발, 오른쪽발, 입력받은 명령의 수
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 5; j++) {
         for (int k = 0; k < size; k++) {
+          
           dp[i][j][k] = max_value;
         }
       }
