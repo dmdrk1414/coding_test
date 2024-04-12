@@ -1,79 +1,88 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
+/*
+4 5 1
+1 2
+1 3
+1 4
+2 4
+3 4
 
-  static BufferedReader br;
-  static StringTokenizer st;
-  static int max_value = 100000 * 4;
-  static int[][] dir = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
-  static ArrayList<Integer> ary;
-  static int answer = max_value;
-  static int[][][] dp;
-  static int size;
+
+*/
+
+  static int N, M, V;
+  static List<List<Integer>> graph;
+  static boolean[] visited_dfs;
+  static boolean[] visited_bfs;
 
   public static void main(String[] args) throws IOException {
-    br = new BufferedReader(new InputStreamReader(System.in));
-    ary = new ArrayList<Integer>();
-    ary.add(-1);
-    input();
-    run();
-    System.out.print(answer);
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String[] input = br.readLine().split(" ");
+    N = Integer.parseInt(input[0]);
+    M = Integer.parseInt(input[1]);
+    V = Integer.parseInt(input[2]);
+    graph = new ArrayList<>();
+    for (int i = 0; i < N + 1; i++) {
+      graph.add(new ArrayList<>());
+    }
+    visited_dfs = new boolean[N + 1];
+    visited_bfs = new boolean[N + 1];
 
-  }
-
-  public static void input() throws IOException {
-    st = new StringTokenizer(br.readLine());
-    int op = 0;
-    while (st.hasMoreTokens()) {
-      op = Integer.parseInt(st.nextToken());
-      if (op == 0) {
-        break;
-      }
-      ary.add(op);
+    int first, second = 0;
+    for (int i = 0; i < M; i++) {
+      input = br.readLine().split(" ");
+      first = Integer.parseInt(input[0]);
+      second = Integer.parseInt(input[1]);
+      graph.get(first).add(second);
+      graph.get(second).add(first);
+    }
+    for (int i = 1; i < N + 1; i++) {
+      Collections.sort(graph.get(i));
     }
 
-    size = ary.size();
-    dp = new int[5][5][size]; // dp 배열 : 왼쪽발, 오른쪽발, 입력받은 명령의 수
-    for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < 5; j++) {
-        for (int k = 0; k < size; k++) {
-          dp[i][j][k] = max_value;
+    dfs(V);
+    System.out.println();
+    bfs(V);
+  }
+
+  public static void dfs(int start) {
+    visited_dfs[start] = true;
+    System.out.print(start + " ");
+
+    for (final Integer value : graph.get(start)) {
+      if (!visited_dfs[value]) {
+        dfs(value);
+      }
+    }
+  }
+
+  public static void bfs(int start) {
+    Queue<Integer> que = new LinkedList<>();
+    que.add(start);
+    visited_bfs[start] = true;
+
+    while (!que.isEmpty()) {
+      int value = que.poll();
+
+      System.out.print(value + " ");
+      for (final Integer val : graph.get(value)) {
+        if (!visited_bfs[val]) {
+          visited_bfs[val] = true;
+          que.add(val);
         }
       }
-    }
-  }
-
-  public static void run() {
-    dp[0][0][0] = 0;
-    for (int idx = 1; idx < size; idx++) {
-      int op = ary.get(idx); // 옮길 발의 위치.
-      for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-          dp[i][op][idx] = Math.min(dp[i][op][idx], dp[i][j][idx - 1] + moveCost(j, op));
-          dp[op][j][idx] = Math.min(dp[op][j][idx], dp[i][j][idx - 1] + moveCost(i, op));
-        }
-      }
-    }
-    int op = ary.get(size - 1);
-    for (int i = 0; i < 5; i++) {
-      answer = Math.min(answer, dp[op][i][size - 1]);
-      answer = Math.min(answer, dp[i][op][size - 1]);
-    }
-  }
-
-  public static int moveCost(int pastOp, int nowOp) {
-    if (pastOp == 0) { // 0에서 뻗어나가면 비용은 2
-      return 2;
-    } else if (pastOp == nowOp) { //발판이 같다면 비용은 1
-      return 1;
-    } else if ((pastOp + nowOp) % 2 == 0) { // 반대방향은 비용이 4
-      return 4;
-    } else { // 인접방향은 비용이3
-      return 3;
     }
   }
 }
