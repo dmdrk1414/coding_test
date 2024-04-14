@@ -1,3 +1,5 @@
+package org.example.two_pointer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,36 +9,11 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
-public class Main {
+public class Back3273 {
 
-  /*
-  10
-  1 2 3 4 5 6 7 8 9 10
-
-  8
-  5 8 12 15 17 19 20 25
-
-
-  4
-  0 0 0 0
-
-  1
-  1
-
-  2
-  1 1
-
-  3
-  1 1 1
-
-  3
-  1 1 2
-
-
-   */
   static FastReader scan = new FastReader();
 
-  static int n;
+  static int n, x;
   static int[] arr;
 
   static void input() {
@@ -45,42 +22,33 @@ public class Main {
     for (int i = 0; i < n; i++) {
       arr[i] = scan.nextInt();
     }
+    x = scan.nextInt();
   }
 
   static void pro() {
     int count = 0;
+    // 투 포인터 알고리즘을 위한 정렬
     Arrays.sort(arr);
 
-    for (int i = 0; i < n; i++) {
-      if (func(i)) {
+    // 투 포인터 설정
+    int left = 0, right = n - 1;
+
+    while (left < right) {
+      int sum = arr[left] + arr[right];
+      if (sum == x) {
         count++;
-      }
-    }
-    System.out.println(count);
-  }
-
-  private static boolean func(final int targetId) {
-    int L = 0, R = n - 1;
-    int target = arr[targetId];
-
-    while (L < R) {
-      if (L == targetId) {
-        L++;
-      } else if (R == targetId) {
-        R--;
+        left++;
+        right--;
+      } else if (sum < x) {
+        // 합이 x보다 작으면 왼쪽 포인터를 오른쪽으로 이동하여 합을 키움
+        left++;
       } else {
-        // 합과 target을 비교
-        int sum = arr[L] + arr[R];
-        if (sum > target) {
-          R--;
-        } else if (sum == target) {
-          return true;
-        } else {
-          L++;
-        }
+        // 합이 x보다 크면 오른쪽 포인터를 왼쪽으로 이동하여 합을 줄임
+        right--;
       }
     }
-    return false;
+
+    System.out.print(count);
   }
 
   public static void main(String[] args) {
