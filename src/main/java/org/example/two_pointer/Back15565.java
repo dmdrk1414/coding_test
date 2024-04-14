@@ -1,7 +1,14 @@
-import java.io.*;
-import java.util.*;
+package org.example.two_pointer;
 
-public class Main {
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class Back15565 {
   /*
 10 3
 1 2 2 2 1 2 1 2 2 1
@@ -19,44 +26,42 @@ public class Main {
 
   static FastReader scan = new FastReader();
 
-  static int n, m, k;
-  static int[] a_arr;
-  static int[] b_arr;
-  static StringBuilder sb = new StringBuilder();
+  static int n, k;
+  static int[] a;
 
   static void input() {
     n = scan.nextInt();
-    m = scan.nextInt();
-    a_arr = new int[n];
+    k = scan.nextInt();
+    a = new int[n];
     for (int i = 0; i < n; i++) {
-      a_arr[i] = scan.nextInt();
-    }
-
-    b_arr = new int[m];
-    for (int i = 0; i < m; i++) {
-      b_arr[i] = scan.nextInt();
+      a[i] = scan.nextInt();
     }
   }
 
   static void pro() {
-    int result_p = 0, A = 0, B = 0;
+    int MOV = 9999_999;
+    int result = MOV;
 
-    while (A < n && B < m) {
-      if (a_arr[A] <= b_arr[B]) {
-        sb.append(a_arr[A++]).append(" ");
-      } else {
-        sb.append(b_arr[B++]).append(" ");
+    int count = 0;
+    for (int L = 0, R = 0; L < n; L++) {
+
+      while (R < n && count < k && a[L] == 1) {
+        if (a[R++] == 1) {
+          count++;
+        }
+      }
+
+      if (a[L] == 1) {
+        result = Math.min(result, R - L);
+        count--;
       }
     }
 
-    while (A < n) {
-      sb.append(a_arr[A++]).append(" ");
+    if (result == MOV) {
+      System.out.println(-1);
+    } else {
+      System.out.println(result);
     }
-    while (B < m) {
-      sb.append(b_arr[B++]).append(" ");
-    }
-
-    System.out.print(sb);
   }
 
   public static void main(String[] args) {
