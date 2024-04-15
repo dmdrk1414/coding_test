@@ -46,6 +46,7 @@ public class Main {
         sb.append(a_arr[A++]).append(" ");
       } else {
         sb.append(b_arr[B++]).append(" ");
+        
       }
     }
 
