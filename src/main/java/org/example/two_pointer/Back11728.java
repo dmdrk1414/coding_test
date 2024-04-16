@@ -1,86 +1,69 @@
+package org.example.two_pointer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
-public class Main {
-
+public class Back11728 {
   /*
-  10
-  1 2 3 4 5 6 7 8 9 10
+10 3
+1 2 2 2 1 2 1 2 2 1
 
-  8
-  5 8 12 15 17 19 20 25
+5 3
+2 2 2 2 2
 
+1 3
+1
 
-  4
-  0 0 0 0
-
-  1
-  1
-
-  2
-  1 1
-
-  3
-  1 1 1
-
-  3
-  1 1 2
-
+1 1
+1
 
    */
+
   static FastReader scan = new FastReader();
 
-  static int n;
-  static int[] arr;
+  static int n, m, k;
+  static int[] a_arr;
+  static int[] b_arr;
+  static StringBuilder sb = new StringBuilder();
 
   static void input() {
     n = scan.nextInt();
-    arr = new int[n];
+    m = scan.nextInt();
+    a_arr = new int[n];
     for (int i = 0; i < n; i++) {
-      arr[i] = scan.nextInt();
+      a_arr[i] = scan.nextInt();
+    }
+
+    b_arr = new int[m];
+    for (int i = 0; i < m; i++) {
+      b_arr[i] = scan.nextInt();
     }
   }
 
   static void pro() {
-    int count = 0;
-    Arrays.sort(arr);
+    int result_p = 0, A = 0, B = 0;
 
-    for (int i = 0; i < n; i++) {
-      if (func(i)) {
-        count++;
-      }
-    }
-    System.out.println(count);
-  }
-
-  private static boolean func(final int targetId) {
-    int L = 0, R = n - 1;
-    int target = arr[targetId];
-
-    while (L < R) {
-      if (L == targetId) {
-        L++;
-      } else if (R == targetId) {
-        R--;
+    while (A < n && B < m) {
+      if (a_arr[A] <= b_arr[B]) {
+        sb.append(a_arr[A++]).append(" ");
       } else {
-        // 합과 target을 비교
-        int sum = arr[L] + arr[R];
-        if (sum > target) {
-          R--;
-        } else if (sum == target) {
-          return true;
-        } else {
-          L++;
-        }
+        sb.append(b_arr[B++]).append(" ");
       }
     }
-    return false;
+
+    while (A < n) {
+      sb.append(a_arr[A++]).append(" ");
+    }
+    while (B < m) {
+      sb.append(b_arr[B++]).append(" ");
+    }
+
+    System.out.print(sb);
   }
 
   public static void main(String[] args) {
