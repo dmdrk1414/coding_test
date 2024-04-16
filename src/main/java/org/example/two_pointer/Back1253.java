@@ -1,3 +1,5 @@
+package org.example.two_pointer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -5,75 +7,82 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
 
-public class Main {
+public class Back1253 {
 
   /*
-2
-abbcaccba
+  10
+  1 2 3 4 5 6 7 8 9 10
 
-1
-abbcaccba
+  8
+  5 8 12 15 17 19 20 25
 
-1
-abbbcaccba
 
-5
-aaaaa
+  4
+  0 0 0 0
 
-2
-aa
+  1
+  1
 
-3
-aaa
+  2
+  1 1
 
-2
-aaa
+  3
+  1 1 1
 
-2
-azz
+  3
+  1 1 2
 
-1
-aaaaa
 
    */
   static FastReader scan = new FastReader();
 
-  static int n, kind;
-  static String in;
-  static int[] map;
+  static int n;
+  static int[] arr;
 
   static void input() {
     n = scan.nextInt();
-    in = scan.nextLine();
+    arr = new int[n];
+    for (int i = 0; i < n; i++) {
+      arr[i] = scan.nextInt();
+    }
   }
 
-
   static void pro() {
-    int sub = 0;
-    int len = in.length();
-    map = new int[26];
-    for (int R = 0, L = 0; R < len; R++) {
-      // add
-      map[in.charAt(R) - 'a'] += 1;
-      if (map[in.charAt(R) - 'a'] == 1) {
-        kind++;
-      }
+    int count = 0;
+    Arrays.sort(arr);
 
-      while (kind > n) {
-        map[in.charAt(L) - 'a'] -= 1;
-        if (map[in.charAt(L) - 'a'] == 0) {
-          kind--;
-        }
-        L++;
+    for (int i = 0; i < n; i++) {
+      if (func(i)) {
+        count++;
       }
-
-      sub = Math.max(sub, R - L + 1);
     }
-    System.out.println(sub);
+    System.out.println(count);
+  }
+
+  private static boolean func(final int targetId) {
+    int L = 0, R = n - 1;
+    int target = arr[targetId];
+
+    while (L < R) {
+      if (L == targetId) {
+        L++;
+      } else if (R == targetId) {
+        R--;
+      } else {
+        // 합과 target을 비교
+        int sum = arr[L] + arr[R];
+        if (sum > target) {
+          R--;
+        } else if (sum == target) {
+          return true;
+        } else {
+          L++;
+        }
+      }
+    }
+    return false;
   }
 
   public static void main(String[] args) {

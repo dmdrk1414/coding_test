@@ -1,85 +1,66 @@
+package org.example.two_pointer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
 
-public class Main {
+public class Back16472 {
 
-  /*
-2
-abbcaccba
-
-1
-abbcaccba
-
-1
-abbbcaccba
-
-5
-aaaaa
-
-2
-aa
-
-3
-aaa
-
-2
-aaa
-
-2
-azz
-
-1
-aaaaa
-
-   */
   static FastReader scan = new FastReader();
+  static StringBuilder sb = new StringBuilder();
 
-  static int n, kind;
-  static String in;
-  static int[] map;
+  static int N, kind;
+  static String A;
+  static int[] cnt;
 
   static void input() {
-    n = scan.nextInt();
-    in = scan.nextLine();
+    N = scan.nextInt();
+    A = scan.nextLine();
+    cnt = new int[26];
   }
 
+  static void add(char c) {  // c 라는 알파벳 추가
+    cnt[c - 'a']++;
+    if (cnt[c - 'a'] == 1)  // 새롭게 나타난 알파벳이라는 뜻
+    {
+      kind++;
+    }
+  }
+
+  static void erase(char x) {  // x 라는 알파벳 제거
+    cnt[x - 'a']--;
+    if (cnt[x - 'a'] == 0)  // 인식해야 하는 알파벳에서 빠지는 순간
+    {
+      kind--;
+    }
+  }
 
   static void pro() {
-    int sub = 0;
-    int len = in.length();
-    map = new int[26];
+    int len = A.length(), ans = 0;
     for (int R = 0, L = 0; R < len; R++) {
-      // add
-      map[in.charAt(R) - 'a'] += 1;
-      if (map[in.charAt(R) - 'a'] == 1) {
-        kind++;
+      // R 번째 문자를 오른쪽에 추가
+      add(A.charAt(R));
+
+      // 불가능하면, 가능할 때까지 L을 이동
+      while (kind > N) {
+        erase(A.charAt(L++));
       }
 
-      while (kind > n) {
-        map[in.charAt(L) - 'a'] -= 1;
-        if (map[in.charAt(L) - 'a'] == 0) {
-          kind--;
-        }
-        L++;
-      }
-
-      sub = Math.max(sub, R - L + 1);
+      // 정답 갱신
+      ans = Math.max(ans, R - L + 1);
     }
-    System.out.println(sub);
+    System.out.println(ans);
   }
 
   public static void main(String[] args) {
     input();
     pro();
   }
+
 
   static class FastReader {
 
