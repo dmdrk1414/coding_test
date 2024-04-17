@@ -13,31 +13,30 @@ import javax.xml.transform.Result;
 public class Main {
 
   /*
-3
-1 1 1
+1 0
+0
 
-3
--1 -1 -1
+1 0
+1
 
-5
+2 0
+0 0
 
-999999999 1000000000 1000000000 1000000000 1000000000
+2 0
+1 1
 
-ans: 999999999 1000000000 1000000000
+5 6
+1 2 3 4 11
 
-5
-
--999999999 -1000000000 -1000000000 -1000000000 -1000000000
-
-ans: -1000000000 -1000000000 -999999999   */
+*/
   static FastReader scan = new FastReader();
 
-  static int n;
+  static int n, m;
   static int[] arr;
-  static int one = 0, two = 0, three = 0;
 
   static void input() {
     n = scan.nextInt();
+    m = scan.nextInt();
     arr = new int[n];
     for (int i = 0; i < n; i++) {
       arr[i] = scan.nextInt();
@@ -46,38 +45,39 @@ ans: -1000000000 -1000000000 -999999999   */
 
 
   static void pro() {
-    long result = 3_000_000_000l;
     Arrays.sort(arr);
-    long sum = 0;
-    for (int i = 2; i < n; i++) {
-      int L = 0, R = i - 1;
+    int result = 2_000_000_000;
+    int L = 0, R = n - 1;
+    int sub = 0;
+    if (n == 1) {
+      System.out.println(arr[0]);
+      return;
+    }
 
-      while (L < R) {
-        sum = (long) arr[L] + (long) arr[R] + (long) arr[i];
-        if (Math.abs(sum) < result) {
-          result = Math.min(result, Math.abs(sum));
+    while (L < R) {
+      sub = arr[R] - arr[L];
+      if (sub >= m && sub < result) {
+        result = Math.min(result, sub);
+      }
 
-          one = arr[L];
-          two = arr[R];
-          three = arr[i];
-        }
-
-        if (sum == 0) {
-          break;
-        }
-        if (sum > 0) {
-          R--;
-        } else {
-          L++;
-        }
+      if (sub == m) {
+        break;
+      }
+      if (sub > m) {
+//        R--;
+        L++;
+      } else {
+//        L++;
+        R--;
       }
     }
+
+    System.out.println(result);
   }
 
   public static void main(String[] args) {
     input();
     pro();
-    System.out.println(one + " " + two + " " + three);
   }
 
   static class FastReader {
