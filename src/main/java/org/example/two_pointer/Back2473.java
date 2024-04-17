@@ -1,3 +1,5 @@
+package org.example.two_pointer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -5,39 +7,37 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
-import javax.xml.transform.Result;
 
-public class Main {
+public class Back2473 {
 
   /*
-1 0
-0
+3
+1 1 1
 
-1 0
-1
+3
+-1 -1 -1
 
-2 0
-0 0
+5
 
-2 0
-1 1
+999999999 1000000000 1000000000 1000000000 1000000000
 
-5 6
-1 2 3 4 11
+ans: 999999999 1000000000 1000000000
 
-*/
+5
+
+-999999999 -1000000000 -1000000000 -1000000000 -1000000000
+
+ans: -1000000000 -1000000000 -999999999   */
   static FastReader scan = new FastReader();
 
-  static int n, m;
-  static int[] arr;
+  static int n;
+  static long[] arr;
+  static int one = 0, two = 0, three = 0;
 
   static void input() {
     n = scan.nextInt();
-    m = scan.nextInt();
-    arr = new int[n];
+    arr = new long[n];
     for (int i = 0; i < n; i++) {
       arr[i] = scan.nextInt();
     }
@@ -45,39 +45,38 @@ public class Main {
 
 
   static void pro() {
+    long result = 3_000_000_000l;
     Arrays.sort(arr);
-    int result = 2_000_000_000;
-    int L = 0, R = n - 1;
-    int sub = 0;
-    if (n == 1) {
-      System.out.println(arr[0]);
-      return;
+    long sum = 0;
+    for (int i = 2; i < n; i++) {
+      int L = 0, R = i - 1;
+
+      while (L < R) {
+        sum = arr[L] + arr[R] + arr[i];
+        if (Math.abs(sum) < result) {
+          result = Math.min(result, Math.abs(sum));
+
+          one = (int) arr[L];
+          two = (int) arr[R];
+          three = (int) arr[i];
+        }
+
+        if (sum == 0) {
+          break;
+        }
+        if (sum > 0) {
+          R--;
+        } else {
+          L++;
+        }
+      }
     }
-
-    while (L < R) {
-      sub = arr[R] - arr[L];
-      if (sub >= m && sub < result) {
-        result = Math.min(result, sub);
-      }
-
-      if (sub == m) {
-        break;
-      }
-      if (sub > m) {
-//        R--;
-        L++;
-      } else {
-//        L++;
-        R--;
-      }
-    }
-
-    System.out.println(result);
   }
 
   public static void main(String[] args) {
     input();
     pro();
+    System.out.println(one + " " + two + " " + three);
   }
 
   static class FastReader {
