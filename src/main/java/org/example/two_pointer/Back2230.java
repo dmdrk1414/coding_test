@@ -1,3 +1,5 @@
+package org.example.two_pointer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -5,12 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
-import javax.xml.transform.Result;
 
-public class Main {
+public class Back2230 {
 
   /*
 1 0
