@@ -1,3 +1,5 @@
+package org.example.two_pointer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -5,12 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
-import javax.xml.transform.Result;
 
-public class Main {
+public class Back2473 {
 
   /*
 3
@@ -33,12 +32,12 @@ ans: -1000000000 -1000000000 -999999999   */
   static FastReader scan = new FastReader();
 
   static int n;
-  static int[] arr;
+  static long[] arr;
   static int one = 0, two = 0, three = 0;
 
   static void input() {
     n = scan.nextInt();
-    arr = new int[n];
+    arr = new long[n];
     for (int i = 0; i < n; i++) {
       arr[i] = scan.nextInt();
     }
@@ -53,13 +52,13 @@ ans: -1000000000 -1000000000 -999999999   */
       int L = 0, R = i - 1;
 
       while (L < R) {
-        sum = (long) arr[L] + (long) arr[R] + (long) arr[i];
+        sum = arr[L] + arr[R] + arr[i];
         if (Math.abs(sum) < result) {
           result = Math.min(result, Math.abs(sum));
 
-          one = arr[L];
-          two = arr[R];
-          three = arr[i];
+          one = (int) arr[L];
+          two = (int) arr[R];
+          three = (int) arr[i];
         }
 
         if (sum == 0) {
