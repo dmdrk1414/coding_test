@@ -4,56 +4,84 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.StringTokenizer;
 import javax.xml.transform.Result;
 
 public class Main {
 
   /*
-5
-1 2 3 4 5
+1
+2
+6
+2
 
-5
-1 2 3 1 2
-
-5
-1 1 1 1 1
+1
+2
+6
+1
 
 */
   static FastReader scan = new FastReader();
 
-  static int n;
-  static int[] arr;
+  static int first, n;
+  static long left, right;
+  static Queue<Integer> que = new LinkedList<>();
+  static long one, two, three;
 
   static void input() {
+    first = scan.nextInt();
+    left = scan.nextLong();
+    right = scan.nextLong();
     n = scan.nextInt();
-    arr = new int[n];
-    for (int i = 0; i < n; i++) {
-      arr[i] = scan.nextInt();
-    }
+    que.add(first);
   }
 
 
   static void pro() {
-    boolean[] check = new boolean[n + 1];
-    // 시작
-    long result = (long) n * (n + 1) / 2;
-    int L = 0, R = 1;
-    check[arr[L]] = true;
-    while (R < n) {
-      if (!check[arr[R]]) {
-        check[arr[R]] = true;
-        R++;
-      } else {
-        result -= n - R;
-        check[arr[L]] = false;
-        L++;
+    for (int i = 0; i < n; i++) {
+      long temp = que.size();
+      for (int j = 0; j < temp; j++) {
+        int value = que.poll();
+
+        if (value == 1) {
+          que.add(1);
+          que.add(3);
+          que.add(2);
+        } else if (value == 2) {
+          que.add(2);
+          que.add(1);
+          que.add(1);
+        } else if (value == 3) {
+          que.add(2);
+          que.add(3);
+          que.add(2);
+        }
       }
     }
-    System.out.println(result);
+    System.out.println(que);
+
+    System.out.println("[2, 1, 1, 1, 3, 2, 1, 3, 2, 1, 3, 2, 2,");
+    for (int i = 0; i < left; i++) {
+      que.poll();
+    }
+    for (long i = left; i <= right; i++) {
+      int value = que.poll();
+      if (value == 1) {
+        one++;
+      } else if (value == 2) {
+        two++;
+      } else if (value == 3) {
+        three++;
+      }
+    }
+    System.out.println(one + " " + two + " " + three);
   }
 
   public static void main(String[] args) {
