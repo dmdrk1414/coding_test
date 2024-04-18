@@ -13,30 +13,23 @@ import javax.xml.transform.Result;
 public class Main {
 
   /*
-1 0
-0
+5
+1 2 3 4 5
 
-1 0
-1
+5
+1 2 3 1 2
 
-2 0
-0 0
-
-2 0
-1 1
-
-5 6
-1 2 3 4 11
+5
+1 1 1 1 1
 
 */
   static FastReader scan = new FastReader();
 
-  static int n, m;
+  static int n;
   static int[] arr;
 
   static void input() {
     n = scan.nextInt();
-    m = scan.nextInt();
     arr = new int[n];
     for (int i = 0; i < n; i++) {
       arr[i] = scan.nextInt();
@@ -45,19 +38,21 @@ public class Main {
 
 
   static void pro() {
-    Arrays.sort(arr);
-    int result = Integer.MAX_VALUE;
-
-    for (int L = 0, R = 0; L < n; L++) {
-      while (R < n && arr[R] - arr[L] < m) {
+    boolean[] check = new boolean[n + 1];
+    // 시작
+    long result = (long) n * (n + 1) / 2;
+    int L = 0, R = 1;
+    check[arr[L]] = true;
+    while (R < n) {
+      if (!check[arr[R]]) {
+        check[arr[R]] = true;
         R++;
-      }
-
-      if (R < n &&arr[R] - arr[L] >= m) {
-        result = Math.min(result, arr[R] - arr[L]);
+      } else {
+        result -= n - R;
+        check[arr[L]] = false;
+        L++;
       }
     }
-
     System.out.println(result);
   }
 
