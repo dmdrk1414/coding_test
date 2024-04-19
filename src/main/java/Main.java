@@ -17,71 +17,54 @@ import javax.xml.transform.Result;
 public class Main {
 
   /*
-1
-2
 6
-2
+10 20 10 30 20 50
 
-1
-2
 6
-1
+1 2 3 4 5 6
+
+6
+1 1 1 1 1 1
+
+9
+10 20 50 10 11 12 13 14 15
+
+4
+10 20 10 20
 
 */
   static FastReader scan = new FastReader();
 
-  static int first, n;
-  static long left, right;
-  static Queue<Integer> que = new LinkedList<>();
-  static long one, two, three;
+  static int n;
+  static int[] arr;
 
   static void input() {
-    first = scan.nextInt();
-    left = scan.nextLong();
-    right = scan.nextLong();
     n = scan.nextInt();
-    que.add(first);
+    arr = new int[n];
+    for (int i = 0; i < n; i++) {
+      arr[i] = scan.nextInt();
+    }
   }
 
 
   static void pro() {
-    for (int i = 0; i < n; i++) {
-      long temp = que.size();
-      for (int j = 0; j < temp; j++) {
-        int value = que.poll();
+    int[] dp = new int[n];
+    Arrays.fill(dp, 1);
 
-        if (value == 1) {
-          que.add(1);
-          que.add(3);
-          que.add(2);
-        } else if (value == 2) {
-          que.add(2);
-          que.add(1);
-          que.add(1);
-        } else if (value == 3) {
-          que.add(2);
-          que.add(3);
-          que.add(2);
+    for (int i = 1; i < n; i++) {
+      for (int j = 0; j < i; j++) {
+        if (arr[i] > arr[j]) {
+          dp[i] = Math.max(dp[i], dp[j] + 1);
         }
       }
     }
-    System.out.println(que);
-
-    System.out.println("[2, 1, 1, 1, 3, 2, 1, 3, 2, 1, 3, 2, 2,");
-    for (int i = 0; i < left; i++) {
-      que.poll();
-    }
-    for (long i = left; i <= right; i++) {
-      int value = que.poll();
-      if (value == 1) {
-        one++;
-      } else if (value == 2) {
-        two++;
-      } else if (value == 3) {
-        three++;
+    int result = 0;
+    for (int i = 0; i < n; i++) {
+      if (dp[i] > result) {
+        result = dp[i];
       }
     }
-    System.out.println(one + " " + two + " " + three);
+    System.out.println(result);
   }
 
   public static void main(String[] args) {
