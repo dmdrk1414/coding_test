@@ -1,66 +1,111 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
+// 물통의 현재 상태와 물을 붓는 행위를 관리하는 구조체
 public class Main {
+  /*
+5 4
+.D.*
+....
+..X.
+S.*.
+....
+
+   */
 
   static FastReader scan = new FastReader();
   static StringBuilder sb = new StringBuilder();
+  static int N, M;
 
-  static int N, group_cnt;
-  static String[] a;
-  static boolean[][] visit;
-  static int[][] dir = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-  static ArrayList<Integer> group;
+  static String[] graph;
+  static int[][] board;
+  static boolean[][] visited;
+  static int[] animal, water;
+  static int count;
+  static int[][] dir = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
   static void input() {
-    N = scan.nextInt();
-    a = new String[N];
+    N = scan.nextInt(); // y
+    M = scan.nextInt(); // x
+    graph = new String[N];
+    visited = new boolean[N][M];
     for (int i = 0; i < N; i++) {
-      a[i] = scan.nextLine();
+      graph[i] = scan.nextLine();
     }
-    visit = new boolean[N][N];
+    board = new int[N][M];
   }
 
-  // x, y 를 갈 수 있다는 걸 알고 방문한 상태
-  static void dfs(int x, int y) {
-    group_cnt++;
-    visit[x][y] = true;
-    for (int k = 0; k < 4; k++) {
-      int nx = x + dir[k][0];
-      int ny = y + dir[k][1];
-      if (nx < 0 || ny < 0 || nx >= N || ny >= N) {
-        continue;  // 지도를 벗어나는 곳으로 가는가?
-      }
-      if (a[nx].charAt(ny) == '0') {
-        continue;  // 갈 수 있는 칸인지 확인해야 한다.
-      }
-      if (visit[nx][ny]) {
-        continue;  // 이미 방문한 적이 있는 곳인가?
-      }
-      dfs(nx, ny);
-    }
+  static void bfs() {
+    Queue<int[]> ani_que = new LinkedList<>();
+    Queue<int[]> water_que = new LinkedList<>();
+    ani_que.add(animal);
+    water_que.add(water);
+    visited[animal[0]][animal[1]] = true;
+    visited[water[0]][water[1]] = true;
+
+//    while (!ani_que.isEmpty()) {
+//      int[] ani_value = ani_que.poll();
+//      int x = ani_value[0], y = ani_value[1];
+//
+//      for (int[] dir : dir) {
+//        int nx = x + dir[0], ny = y + dir[1];
+//        if (nx < 0 || nx >= N || ny < 0 || ny >= M) {
+//          continue;
+//        }
+//        if (visited[nx][ny]) {
+//          continue;
+//        }
+//        if (graph[nx].charAt(ny) == 'X' || graph[nx].charAt(ny) == '*') {
+//          continue;
+//        }
+//        if (graph[nx].charAt(ny) == '.') {
+//          animal.
+//        }
+//      }
+//    }
   }
 
-  static void pro() {
-    group = new ArrayList<>();
+  static void water_bfs() {
+    Queue<int[]> water_que = new LinkedList<>();
+
     for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        if (!visit[i][j] && a[i].charAt(j) == '1') {
-          // 갈 수 있는 칸인데, 이미 방문처리 된, 즉 새롭게 만난 단지인 경우!
-          group_cnt = 0;
-          dfs(i, j);
-          group.add(group_cnt);
+      for (int j = 0; j < M; j++) {
+        if (graph[i].charAt(j) == '*') {
+          water_que.add(new int[]{i, j});
         }
       }
     }
 
-    Collections.sort(group);
-    sb.append(group.size()).append('\n');
-    for (int cnt : group) {
-      sb.append(cnt).append('\n');
+    while (!water_que.isEmpty()) {
+      int[] water_value = water_que.poll();
+      int x = water_value[0], y = water_value[1];
+      for (int[] dir : dir) {
+        int nx = x + dir[0], ny = y + dir[1];
+        if (nx < 0 || nx >= N || ny < 0 || ny >= M) {
+          continue;
+        }
+        if (visited[nx][ny]) {
+          continue;
+        }
+        if (graph[nx].charAt(ny) == 'X' || graph[nx].charAt(ny) == 'D') {
+          continue;
+        }
+
+        if (graph[nx].charAt(ny) == '.') {
+          board[nx][ny] += (board[x][y] + 1);
+          visited[nx][ny] = true;
+          water_que.add(new int[]{nx, ny});
+        }
+      }
     }
-    System.out.println(sb.toString());
+    for (final int[] ints : board) {
+      System.out.println(Arrays.toString(ints));
+    }
+  }
+
+  static void pro() {
+    count = 0;
+    water_bfs();
   }
 
   public static void main(String[] args) {
