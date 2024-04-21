@@ -1,93 +1,118 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.StringTokenizer;
-import javax.xml.transform.Result;
+import java.io.*;
+import java.util.*;
 
+// 물통의 현재 상태와 물을 붓는 행위를 관리하는 구조체
 public class Main {
-
   /*
-1
-2
-6
-2
+5 4
+.D.*
+....
+..X.
+S.*.
+....
 
-1
-2
-6
-1
+   */
 
-*/
   static FastReader scan = new FastReader();
+  static StringBuilder sb = new StringBuilder();
+  static int N, M;
 
-  static int first, n;
-  static long left, right;
-  static Queue<Integer> que = new LinkedList<>();
-  static long one, two, three;
+  static String[] graph;
+  static int[][] board;
+  static boolean[][] visited;
+  static int[] animal, water;
+  static int count;
+  static int[][] dir = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
   static void input() {
-    first = scan.nextInt();
-    left = scan.nextLong();
-    right = scan.nextLong();
-    n = scan.nextInt();
-    que.add(first);
+    N = scan.nextInt(); // y
+    M = scan.nextInt(); // x
+    graph = new String[N];
+    visited = new boolean[N][M];
+    for (int i = 0; i < N; i++) {
+      graph[i] = scan.nextLine();
+    }
+    board = new int[N][M];
   }
 
+  static void bfs() {
+    Queue<int[]> ani_que = new LinkedList<>();
+    Queue<int[]> water_que = new LinkedList<>();
+    ani_que.add(animal);
+    water_que.add(water);
+    visited[animal[0]][animal[1]] = true;
+    visited[water[0]][water[1]] = true;
 
-  static void pro() {
-    for (int i = 0; i < n; i++) {
-      long temp = que.size();
-      for (int j = 0; j < temp; j++) {
-        int value = que.poll();
+//    while (!ani_que.isEmpty()) {
+//      int[] ani_value = ani_que.poll();
+//      int x = ani_value[0], y = ani_value[1];
+//
+//      for (int[] dir : dir) {
+//        int nx = x + dir[0], ny = y + dir[1];
+//        if (nx < 0 || nx >= N || ny < 0 || ny >= M) {
+//          continue;
+//        }
+//        if (visited[nx][ny]) {
+//          continue;
+//        }
+//        if (graph[nx].charAt(ny) == 'X' || graph[nx].charAt(ny) == '*') {
+//          continue;
+//        }
+//        if (graph[nx].charAt(ny) == '.') {
+//          animal.
+//        }
+//      }
+//    }
+  }
 
-        if (value == 1) {
-          que.add(1);
-          que.add(3);
-          que.add(2);
-        } else if (value == 2) {
-          que.add(2);
-          que.add(1);
-          que.add(1);
-        } else if (value == 3) {
-          que.add(2);
-          que.add(3);
-          que.add(2);
+  static void water_bfs() {
+    Queue<int[]> water_que = new LinkedList<>();
+
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < M; j++) {
+        if (graph[i].charAt(j) == '*') {
+          water_que.add(new int[]{i, j});
         }
       }
     }
-    System.out.println(que);
 
-    System.out.println("[2, 1, 1, 1, 3, 2, 1, 3, 2, 1, 3, 2, 2,");
-    for (int i = 0; i < left; i++) {
-      que.poll();
-    }
-    for (long i = left; i <= right; i++) {
-      int value = que.poll();
-      if (value == 1) {
-        one++;
-      } else if (value == 2) {
-        two++;
-      } else if (value == 3) {
-        three++;
+    while (!water_que.isEmpty()) {
+      int[] water_value = water_que.poll();
+      int x = water_value[0], y = water_value[1];
+      for (int[] dir : dir) {
+        int nx = x + dir[0], ny = y + dir[1];
+        if (nx < 0 || nx >= N || ny < 0 || ny >= M) {
+          continue;
+        }
+        if (visited[nx][ny]) {
+          continue;
+        }
+        if (graph[nx].charAt(ny) == 'X' || graph[nx].charAt(ny) == 'D') {
+          continue;
+        }
+
+        if (graph[nx].charAt(ny) == '.') {
+          board[nx][ny] += (board[x][y] + 1);
+          visited[nx][ny] = true;
+          water_que.add(new int[]{nx, ny});
+        }
       }
     }
-    System.out.println(one + " " + two + " " + three);
+    for (final int[] ints : board) {
+      System.out.println(Arrays.toString(ints));
+    }
+  }
+
+  static void pro() {
+    count = 0;
+    water_bfs();
   }
 
   public static void main(String[] args) {
     input();
     pro();
   }
+
 
   static class FastReader {
 
