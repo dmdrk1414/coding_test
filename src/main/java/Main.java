@@ -1,129 +1,151 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-import javax.xml.transform.Result;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Main {
 
   /*
-1 0
-0
+5 4
+.D.*
+....
+..X.
+S.*.
+....
 
-1 0
-1
+   */
+  static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+  static int[][] water_board;
+  static int[][] ani_board;
+  static boolean[][] visited;
+  static String[] graph;
+  static int N, M;
+  static int[][] dir = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
-2 0
-0 0
-
-2 0
-1 1
-
-5 6
-1 2 3 4 11
-
-*/
-  static FastReader scan = new FastReader();
-
-  static int n, m;
-  static int[] arr;
-
-  static void input() {
-    n = scan.nextInt();
-    m = scan.nextInt();
-    arr = new int[n];
-    for (int i = 0; i < n; i++) {
-      arr[i] = scan.nextInt();
+  static void input() throws IOException {
+    String[] input_arr = br.readLine().split(" ");
+    N = Integer.parseInt(input_arr[0]);
+    M = Integer.parseInt(input_arr[1]);
+    water_board = new int[N][M];
+    ani_board = new int[N][M];
+    visited = new boolean[N][M];
+    graph = new String[N];
+    for (int i = 0; i < N; i++) {
+      graph[i] = br.readLine().trim();
     }
   }
 
-
-  static void pro() {
-    Arrays.sort(arr);
-    int result = 2_000_000_000;
-    int L = 0, R = n - 1;
-    int sub = 0;
-    if (n == 1) {
-      System.out.println(arr[0]);
-      return;
-    }
-
-    while (L < R) {
-      sub = arr[R] - arr[L];
-      if (sub >= m && sub < result) {
-        result = Math.min(result, sub);
-      }
-
-      if (sub == m) {
-        break;
-      }
-      if (sub > m) {
-//        R--;
-        L++;
-      } else {
-//        L++;
-        R--;
-      }
-    }
-
-    System.out.println(result);
-  }
-
-  public static void main(String[] args) {
-    input();
-    pro();
-  }
-
-  static class FastReader {
-
-    BufferedReader br;
-    StringTokenizer st;
-
-    public FastReader() {
-      br = new BufferedReader(new InputStreamReader(System.in));
-    }
-
-    public FastReader(String s) throws FileNotFoundException {
-      br = new BufferedReader(new FileReader(new File(s)));
-    }
-
-    String next() {
-      while (st == null || !st.hasMoreElements()) {
-        try {
-          st = new StringTokenizer(br.readLine());
-        } catch (IOException e) {
-          e.printStackTrace();
+  static void water_bfs() {
+    Queue<Integer> q = new LinkedList<>();
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < M; j++) {
+        water_board[i][j] = -1;
+        visited[i][j] = false;
+        if (graph[i].charAt(j) == '*') {
+          q.add(i);
+          q.add(j);
+          water_board[i][j] = 0;
+          visited[i][j] = true;
         }
       }
-      return st.nextToken();
     }
 
-    int nextInt() {
-      return Integer.parseInt(next());
-    }
+    while (!q.isEmpty()) {
+      int x = q.poll();
+      int y = q.poll();
 
-    long nextLong() {
-      return Long.parseLong(next());
-    }
+      for (int i = 0; i < dir.length; i++) {
+        int nx = x + dir[i][0];
+        int ny = y + dir[i][1];
 
-    double nextDouble() {
-      return Double.parseDouble(next());
-    }
-
-    String nextLine() {
-      String str = "";
-      try {
-        str = br.readLine();
-      } catch (IOException e) {
-        e.printStackTrace();
+        if (nx < 0 || nx >= N || ny < 0 || ny >= M) {
+          continue;
+        }
+        if (graph[nx].charAt(ny) != '.') {
+          continue;
+        }
+        if (visited[nx][ny]) {
+          continue;
+        }
+        q.add(nx);
+        q.add(ny);
+        visited[nx][ny] = true;
+        water_board[nx][ny] = water_board[x][y] + 1;
       }
-      return str;
     }
+  }
+
+  private static void ani_bfs() {
+    Queue<Integer> q = new LinkedList<>();
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < M; j++) {
+        ani_board[i][j] = -1;
+        visited[i][j] = false;
+        if (graph[i].charAt(j) == 'S') {
+          q.add(i);
+          q.add(j);
+          ani_board[i][j] = 0;
+          visited[i][j] = true;
+        }
+      }
+    }
+
+    while (!q.isEmpty()) {
+      int x = q.poll();
+      int y = q.poll();
+
+      for (int i = 0; i < dir.length; i++) {
+        int nx = x + dir[i][0];
+        int ny = y + dir[i][1];
+
+        if (nx < 0 || nx >= N || ny < 0 || ny >= M) {
+          continue;
+        }
+        if (graph[nx].charAt(ny) != '.' && graph[nx].charAt(ny) != 'D') {
+          continue;
+        }
+        if (water_board[nx][ny] != -1 && ani_board[x][y] + 1 >= water_board[nx][ny]) {
+          continue;
+        }
+        if (visited[nx][ny]) {
+          continue;
+        }
+
+        q.add(nx);
+        q.add(ny);
+        visited[nx][ny] = true;
+        ani_board[nx][ny] = ani_board[x][y] + 1;
+      }
+    }
+  }
+
+  static void pro() {
+    water_bfs();
+    ani_bfs();
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < M; j++) {
+        if (graph[i].charAt(j) == 'D') {
+          if (ani_board[i][j] == -1) {
+            System.out.println("KAKTUS");
+          } else {
+            System.out.println(ani_board[i][j]);
+          }
+        }
+      }
+    }
+  }
+
+
+  static void print(int[][] arr) {
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < M; j++) {
+        System.out.print(arr[i][j] + " ");
+      }
+      System.out.println();
+    }
+  }
+
+  public static void main(String[] args) throws IOException {
+    input();
+    pro();
   }
 }
