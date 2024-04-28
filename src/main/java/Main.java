@@ -1,68 +1,90 @@
-import java.io.*;
-import java.lang.reflect.Array;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 public class Main {
 
   static FastReader scan = new FastReader();
   static StringBuilder sb = new StringBuilder();
 
-  static int N;
-  static int[] parent;
-  static ArrayList<Integer>[] adj;
-  static boolean[] visit;
+  static int N, M;
+  static int[] temp;
+  static int[][] target;
+  static boolean[][] visited;
+  static int[][] board;
+  static int[][] dir = new int[][]{{1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}, {-2, 1},
+      {-1, 2}};
 
+  /*
+5 3
+2 4
+3 2
+3 5
+4 5
+
+   */
   static void input() {
     N = scan.nextInt();
-    adj = new ArrayList[N + 1];
-    parent = new int[N + 1];
-    for (int i = 1; i <= N; i++) {
-      adj[i] = new ArrayList<>();
-    }
-    for (int i = 0; i < N - 1; i++) {
-      int x = scan.nextInt(), y = scan.nextInt();
-      adj[x].add(y);
-      adj[y].add(x);
+    M = scan.nextInt();
+    visited = new boolean[N][N];
+    temp = new int[2];
+    temp[0] = scan.nextInt() - 1;
+    temp[1] = scan.nextInt() - 1;
+    target = new int[M][2];
+    for (int i = 0; i < M; i++) {
+      target[i] = new int[2];
+      target[i][0] = scan.nextInt() - 1;
+      target[i][1] = scan.nextInt() - 1;
     }
   }
 
-  // start 에서 시작해서 갈 수 있는 정점들을 모두 탐색하기
-  static void bfs(int start) {
-    Queue<Integer> que = new LinkedList<>();
+  static void bfs(int _x, int _y) {
+    Queue<Integer> q = new LinkedList<>();
+    q.add(_x);
+    q.add(_y);
+    visited[_x][_y] = true;
+    board = new int[N][N];
 
-    // start는 방문 가능한 점이므로 que에 넣어준다.
-    que.add(start);
-    visit[start] = true;  // start를 갈 수 있다고 표시하기 (중요!!!)
+    while (!q.isEmpty()) {
+      int x = q.poll();
+      int y = q.poll();
 
-    while (!que.isEmpty()) {  // 더 확인할 점이 없다면 정지
-      int x = que.poll();
+      for (int i = 0; i < dir.length; i++) {
+        int nx = x + dir[i][0];
+        int ny = y + dir[i][1];
 
-      for (int y : adj[x]) {
-        if (visit[y]) {
-          continue;  // x 에서 y 를 갈 수는 있지만, 이미 탐색한 점이면 무시
+        if (nx < 0 || ny < 0 || nx >= N || ny >= N) {
+          continue;
         }
-
-        // y를 갈 수 있으니까 que에 추가하고, visit 처리 하기!
-        que.add(y);
-        parent[y] = x;
-        visit[y] = true;
+        if (visited[nx][ny]) {
+          continue;
+        }
+        q.add(nx);
+        q.add(ny);
+        visited[nx][ny] = true;
+        board[nx][ny] = board[x][y] + 1;
       }
+    }
+
+    for (int i = 0; i < M; i++) {
+      sb.append(board[target[i][0]][target[i][1]]).append(" ");
     }
   }
 
   static void pro() {
-    visit = new boolean[N + 1];
-    bfs(1);
-    int ans = 0;
-    for (int i = 2; i <= N; i++) {
-      sb.append(parent[i]).append('\n');
-    }
-    System.out.println(sb);
+    bfs(temp[0], temp[1]);
   }
 
   public static void main(String[] args) {
     input();
     pro();
+    System.out.println(sb);
   }
 
 
