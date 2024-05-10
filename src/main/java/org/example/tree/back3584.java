@@ -73,7 +73,6 @@ public class back3584 {
 
   public static void main(String[] args) throws IOException {
     int T = scan.nextInt();
-
     for (int i = 0; i < T; i++) {
       input();
       pro();
