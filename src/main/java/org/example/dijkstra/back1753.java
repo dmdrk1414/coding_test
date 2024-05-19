@@ -60,12 +60,11 @@ public class back1753 {
         q.add(new Info(e.to, dists[e.to]));
       }
     }
-    
+
   }
 
   static void pro() {
     dijkstra(K);
-
     for (int i = 1; i <= N; i++) {
       if (dists[i] == Integer.MAX_VALUE)
         sb.append("INF").append("\n");
