@@ -22,7 +22,6 @@ public class back4386 {
   static double ans;
 
   static void input() {
-
     N = scan.nextInt();
 
     edges = new ArrayList<>();
