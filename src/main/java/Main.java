@@ -1,137 +1,152 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+/////////////////////////////////////////////////////////////////////////////////////////////
+// 기본 제공코드는 임의 수정해도 관계 없습니다. 단, 입출력 포맷 주의
+// 아래 표준 입출력 예제 필요시 참고하세요.
+// 표준 입력 예제
+// int a;
+// double b;
+// char g;
+// String var;
+// long AB;
+// a = sc.nextInt();                           // int 변수 1개 입력받는 예제
+// b = sc.nextDouble();                        // double 변수 1개 입력받는 예제
+// g = sc.nextByte();                          // char 변수 1개 입력받는 예제
+// var = sc.next();                            // 문자열 1개 입력받는 예제
+// AB = sc.nextLong();                         // long 변수 1개 입력받는 예제
+/////////////////////////////////////////////////////////////////////////////////////////////
+// 표준 출력 예제
+// int a = 0;                            
+// double b = 1.0;               
+// char g = 'b';
+// String var = "ABCDEFG";
+// long AB = 12345678901234567L;
+//System.out.println(a);                       // int 변수 1개 출력하는 예제
+//System.out.println(b); 		       						 // double 변수 1개 출력하는 예제
+//System.out.println(g);		       						 // char 변수 1개 출력하는 예제
+//System.out.println(var);		       				   // 문자열 1개 출력하는 예제
+//System.out.println(AB);		       				     // long 변수 1개 출력하는 예제
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-public class Main {
+import java.util.*;
 
-  static FastReader scan = new FastReader();
+/*
+10
+5
+0 0 100 100 70 40 30 10 10 5 90 70 50 20
+6
+88 81 85 80 19 22 31 15 27 29 30 10 20 26 5 14
+7
+22 47 72 42 61 93 8 31 72 54 0 64 26 71 93 87 84 83
+8
+30 20 43 14 58 5 91 51 55 87 40 91 14 55 28 80 75 24 74 63
+9
+3 9 100 100 16 52 18 19 35 67 42 29 47 68 59 38 68 81 80 37 94 92
+10
+39 9 97 61 35 93 62 64 96 39 36 36 9 59 59 96 61 7 64 43 43 58 1 36
+10
+26 100 72 2 71 100 29 48 74 51 27 0 58 0 35 2 43 47 50 49 44 100 66 96
+10
+46 25 16 6 48 82 80 21 49 34 60 25 93 90 26 96 12 100 44 69 28 15 57 63
+10
+94 83 72 42 43 36 59 44 52 57 34 49 65 79 14 20 41 9 0 39 100 94 53 3
+10
+32 79 0 0 69 58 100 31 67 67 58 66 83 22 44 24 68 3 76 85 63 87 7 86
+
+1
+5
+0 0 100 100 70 40 30 10 10 5 90 70 50 20
+
+ */
+class Solution {
   static StringBuilder sb = new StringBuilder();
+  static int N;
+  static Point coporation;
+  static Point homePoint;
+  static Point[] points;
+  static Scanner sc = new Scanner(System.in);
+  static boolean[] visited;
+  static int min_distance;
 
-  static int N, M;
-  static int[] temp;
-  static int[][] target;
-  static boolean[][] visited;
-  static int[][] board;
-  static int[][] dir = new int[][]{{1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}, {-2, 1},
-      {-1, 2}};
+  private static void input() {
+    N = sc.nextInt();
+    coporation = new Point(sc.nextInt(), sc.nextInt());
+    homePoint = new Point(sc.nextInt(), sc.nextInt());
+    points = new Point[N + 1];
+    visited = new boolean[N + 1];
+    min_distance = Integer.MAX_VALUE;
 
-  /*
-5 3
-2 4
-3 2
-3 5
-4 5
-
-   */
-  static void input() {
-    N = scan.nextInt();
-    M = scan.nextInt();
-    visited = new boolean[N][N];
-    temp = new int[2];
-    temp[0] = scan.nextInt() - 1;
-    temp[1] = scan.nextInt() - 1;
-    target = new int[M][2];
-    for (int i = 0; i < M; i++) {
-      target[i] = new int[2];
-      target[i][0] = scan.nextInt() - 1;
-      target[i][1] = scan.nextInt() - 1;
+    for (int i = 1; i <= N; i++) {
+      points[i] = new Point(sc.nextInt(), sc.nextInt());
     }
   }
 
-  static void bfs(int _x, int _y) {
-    Queue<Integer> q = new LinkedList<>();
-    q.add(_x);
-    q.add(_y);
-    visited[_x][_y] = true;
-    board = new int[N][N];
+  private static void pro() {
+    dfs(1, 0, coporation);
+  }
 
-    while (!q.isEmpty()) {
-      int x = q.poll();
-      int y = q.poll();
+  private static void dfs(int depth, int distance, Point lastPoint) {
+    if (distance >= min_distance) {
+      return;
+    }
 
-      for (int i = 0; i < dir.length; i++) {
-        int nx = x + dir[i][0];
-        int ny = y + dir[i][1];
-
-        if (nx < 0 || ny < 0 || nx >= N || ny >= N) {
-          continue;
-        }
-        if (visited[nx][ny]) {
-          continue;
-        }
-        q.add(nx);
-        q.add(ny);
-        visited[nx][ny] = true;
-        board[nx][ny] = board[x][y] + 1;
+    if (depth == N + 1) {
+      // 모든 고객을 확인하고, 집으로 돌아가는 길
+      int final_distance = distance + distance(lastPoint, homePoint);
+      if (final_distance < min_distance) {
+        min_distance = final_distance;
+        return;
+      }
+    } else {
+      for (int i = 1; i <= N; i++) {
+        if (visited[i]) continue;
+        visited[i] = true;
+        int next_distance = distance + distance(lastPoint, points[i]);
+        dfs(depth + 1, next_distance, points[i]);
+        visited[i] = false;
       }
     }
+  }
 
-    for (int i = 0; i < M; i++) {
-      sb.append(board[target[i][0]][target[i][1]]).append(" ");
+  private static int distance(final Point point1, final Point point2) {
+    return Math.abs(point1.x - point2.x) + Math.abs(point1.y - point2.y);
+  }
+
+  public static void main(String args[]) throws Exception {
+    int T;
+    T = sc.nextInt();
+
+    for (int test_case = 1; test_case <= T; test_case++) {
+      input();
+      pro();
+
+      System.out.printf("#%d %d\n", test_case, min_distance);
     }
   }
 
-  static void pro() {
-    bfs(temp[0], temp[1]);
-  }
+  static class Edge implements Comparable<Edge> {
+    int start, end;
+    int weight;
 
-  public static void main(String[] args) {
-    input();
-    pro();
-    System.out.println(sb);
-  }
-
-
-  static class FastReader {
-
-    BufferedReader br;
-    StringTokenizer st;
-
-    public FastReader() {
-      br = new BufferedReader(new InputStreamReader(System.in));
+    public Edge(int start, int end, int weight) {
+      this.start = start;
+      this.end = end;
+      this.weight = weight;
     }
 
-    public FastReader(String s) throws FileNotFoundException {
-      br = new BufferedReader(new FileReader(new File(s)));
-    }
-
-    String next() {
-      while (st == null || !st.hasMoreElements()) {
-        try {
-          st = new StringTokenizer(br.readLine());
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+    @Override
+    public int compareTo(Edge o) {
+      if (this.weight != o.weight) {
+        return this.weight - o.weight;
       }
-      return st.nextToken();
+      return 0;
     }
+  }
 
-    int nextInt() {
-      return Integer.parseInt(next());
-    }
+  static class Point {
+    int x, y;
 
-    long nextLong() {
-      return Long.parseLong(next());
-    }
-
-    double nextDouble() {
-      return Double.parseDouble(next());
-    }
-
-    String nextLine() {
-      String str = "";
-      try {
-        str = br.readLine();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      return str;
+    public Point(int x, int y) {
+      this.x = x;
+      this.y = y;
     }
   }
 }
