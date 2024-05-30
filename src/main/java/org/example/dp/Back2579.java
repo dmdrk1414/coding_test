@@ -26,8 +26,6 @@ public class Back2579 {
   25
   10
   20
-
-
    */
   static void input() {
     FastReader scan = new FastReader();
