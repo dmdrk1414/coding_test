@@ -23,7 +23,6 @@ public class back1516 {
    */
   static FastReader scan = new FastReader();
   static StringBuilder sb = new StringBuilder();
-
   static int N;
   static int[] indeg, seconds;
   static long[] board;
