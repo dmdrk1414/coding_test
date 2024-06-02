@@ -46,13 +46,6 @@ public class back1516 {
       }
     }
 
-//    System.out.println("seconds " + Arrays.toString(seconds));
-//    int i = 0;
-//    for (ArrayList<Integer> integers : adj) {
-//      System.out.println(i++ + " " + integers);
-//    }
-//    System.out.println("indeg " + Arrays.toString(indeg));
-//    System.out.println();
   }
 
   static void pro() {
