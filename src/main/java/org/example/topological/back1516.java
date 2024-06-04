@@ -50,7 +50,6 @@ public class back1516 {
 
   static void pro() {
     Queue<Integer> q = new LinkedList<>();
-
     for (int i = 1; i <= N; i++) {
       if (indeg[i] == 0) {
         q.add(i);
