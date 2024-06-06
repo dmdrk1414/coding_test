@@ -1,31 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////////////////////
-// 기본 제공코드는 임의 수정해도 관계 없습니다. 단, 입출력 포맷 주의
-// 아래 표준 입출력 예제 필요시 참고하세요.
-// 표준 입력 예제
-// int a;
-// double b;
-// char g;
-// String var;
-// long AB;
-// a = sc.nextInt();                           // int 변수 1개 입력받는 예제
-// b = sc.nextDouble();                        // double 변수 1개 입력받는 예제
-// g = sc.nextByte();                          // char 변수 1개 입력받는 예제
-// var = sc.next();                            // 문자열 1개 입력받는 예제
-// AB = sc.nextLong();                         // long 변수 1개 입력받는 예제
-/////////////////////////////////////////////////////////////////////////////////////////////
-// 표준 출력 예제
-// int a = 0;                            
-// double b = 1.0;               
-// char g = 'b';
-// String var = "ABCDEFG";
-// long AB = 12345678901234567L;
-//System.out.println(a);                       // int 변수 1개 출력하는 예제
-//System.out.println(b); 		       						 // double 변수 1개 출력하는 예제
-//System.out.println(g);		       						 // char 변수 1개 출력하는 예제
-//System.out.println(var);		       				   // 문자열 1개 출력하는 예제
-//System.out.println(AB);		       				     // long 변수 1개 출력하는 예제
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 import java.util.*;
 
 /*
@@ -56,97 +28,97 @@ import java.util.*;
 0 0 100 100 70 40 30 10 10 5 90 70 50 20
 
  */
-class Solution {
-  static StringBuilder sb = new StringBuilder();
-  static int N;
-  static Point coporation;
-  static Point homePoint;
-  static Point[] points;
-  static Scanner sc = new Scanner(System.in);
-  static boolean[] visited;
-  static int min_distance;
+class Main {
+    static StringBuilder sb = new StringBuilder();
+    static int N;
+    static Point coporation;
+    static Point homePoint;
+    static Point[] points;
+    static Scanner sc = new Scanner(System.in);
+    static boolean[] visited;
+    static int min_distance;
 
-  private static void input() {
-    N = sc.nextInt();
-    coporation = new Point(sc.nextInt(), sc.nextInt());
-    homePoint = new Point(sc.nextInt(), sc.nextInt());
-    points = new Point[N + 1];
-    visited = new boolean[N + 1];
-    min_distance = Integer.MAX_VALUE;
+    private static void input() {
+        N = sc.nextInt();
+        coporation = new Point(sc.nextInt(), sc.nextInt());
+        homePoint = new Point(sc.nextInt(), sc.nextInt());
+        points = new Point[N + 1];
+        visited = new boolean[N + 1];
+        min_distance = Integer.MAX_VALUE;
 
-    for (int i = 1; i <= N; i++) {
-      points[i] = new Point(sc.nextInt(), sc.nextInt());
-    }
-  }
-
-  private static void pro() {
-    dfs(1, 0, coporation);
-  }
-
-  private static void dfs(int depth, int distance, Point lastPoint) {
-    if (distance >= min_distance) {
-      return;
+        for (int i = 1; i <= N; i++) {
+            points[i] = new Point(sc.nextInt(), sc.nextInt());
+        }
     }
 
-    if (depth == N + 1) {
-      // 모든 고객을 확인하고, 집으로 돌아가는 길
-      int final_distance = distance + distance(lastPoint, homePoint);
-      if (final_distance < min_distance) {
-        min_distance = final_distance;
-        return;
-      }
-    } else {
-      for (int i = 1; i <= N; i++) {
-        if (visited[i]) continue;
-        visited[i] = true;
-        int next_distance = distance + distance(lastPoint, points[i]);
-        dfs(depth + 1, next_distance, points[i]);
-        visited[i] = false;
-      }
-    }
-  }
-
-  private static int distance(final Point point1, final Point point2) {
-    return Math.abs(point1.x - point2.x) + Math.abs(point1.y - point2.y);
-  }
-
-  public static void main(String args[]) throws Exception {
-    int T;
-    T = sc.nextInt();
-
-    for (int test_case = 1; test_case <= T; test_case++) {
-      input();
-      pro();
-
-      System.out.printf("#%d %d\n", test_case, min_distance);
-    }
-  }
-
-  static class Edge implements Comparable<Edge> {
-    int start, end;
-    int weight;
-
-    public Edge(int start, int end, int weight) {
-      this.start = start;
-      this.end = end;
-      this.weight = weight;
+    private static void pro() {
+        dfs(1, 0, coporation);
     }
 
-    @Override
-    public int compareTo(Edge o) {
-      if (this.weight != o.weight) {
-        return this.weight - o.weight;
-      }
-      return 0;
-    }
-  }
+    private static void dfs(int depth, int distance, Point lastPoint) {
+        if (distance >= min_distance) {
+            return;
+        }
 
-  static class Point {
-    int x, y;
-
-    public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
+        if (depth == N + 1) {
+            // 모든 고객을 확인하고, 집으로 돌아가는 길
+            int final_distance = distance + distance(lastPoint, homePoint);
+            if (final_distance < min_distance) {
+                min_distance = final_distance;
+                return;
+            }
+        } else {
+            for (int i = 1; i <= N; i++) {
+                if (visited[i]) continue;
+                visited[i] = true;
+                int next_distance = distance + distance(lastPoint, points[i]);
+                dfs(depth + 1, next_distance, points[i]);
+                visited[i] = false;
+            }
+        }
     }
-  }
+
+    private static int distance(final Point point1, final Point point2) {
+        return Math.abs(point1.x - point2.x) + Math.abs(point1.y - point2.y);
+    }
+
+    public static void main(String args[]) throws Exception {
+        int T;
+        T = sc.nextInt();
+
+        for (int test_case = 1; test_case <= T; test_case++) {
+            input();
+            pro();
+
+            System.out.printf("#%d %d\n", test_case, min_distance);
+        }
+    }
+
+    static class Edge implements Comparable<Edge> {
+        int start, end;
+        int weight;
+
+        public Edge(int start, int end, int weight) {
+            this.start = start;
+            this.end = end;
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(Edge o) {
+            if (this.weight != o.weight) {
+                return this.weight - o.weight;
+            }
+            return 0;
+        }
+    }
+
+    static class Point {
+        int x, y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 }
