@@ -56,6 +56,7 @@ class Solution {
             if (check(dist)) {
                 // 1.2.1 결과 저장
                 answer = depth;
+                
             }
         }
         // 2. 복사된(org)만큼 루프 시작 i = 0 으로 시작한다. (순서 중요 X )
