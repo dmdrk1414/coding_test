@@ -45,7 +45,6 @@ public class back1516 {
         indeg[i]++;
       }
     }
-
   }
 
   static void pro() {
