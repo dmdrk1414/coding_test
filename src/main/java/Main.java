@@ -26,88 +26,96 @@
 //System.out.println(AB);		       				     // long 변수 1개 출력하는 예제
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+import java.io.FileInputStream;
 
 /*
-10
-5
-0 0 100 100 70 40 30 10 10 5 90 70 50 20
-6
-88 81 85 80 19 22 31 15 27 29 30 10 20 26 5 14
-7
-22 47 72 42 61 93 8 31 72 54 0 64 26 71 93 87 84 83
-8
-30 20 43 14 58 5 91 51 55 87 40 91 14 55 28 80 75 24 74 63
-9
-3 9 100 100 16 52 18 19 35 67 42 29 47 68 59 38 68 81 80 37 94 92
-10
-39 9 97 61 35 93 62 64 96 39 36 36 9 59 59 96 61 7 64 43 43 58 1 36
-10
-26 100 72 2 71 100 29 48 74 51 27 0 58 0 35 2 43 47 50 49 44 100 66 96
-10
-46 25 16 6 48 82 80 21 49 34 60 25 93 90 26 96 12 100 44 69 28 15 57 63
-10
-94 83 72 42 43 36 59 44 52 57 34 49 65 79 14 20 41 9 0 39 100 94 53 3
-10
-32 79 0 0 69 58 100 31 67 67 58 66 83 22 44 24 68 3 76 85 63 87 7 86
+   사용하는 클래스명이 Solution 이어야 하므로, 가급적 Solution.java 를 사용할 것을 권장합니다.
+   이러한 상황에서도 동일하게 java Solution 명령으로 프로그램을 수행해볼 수 있습니다.
 
 1
-5
-0 0 100 100 70 40 30 10 10 5 90 70 50 20
+2 2 10
+1 1
+0 2
 
  */
 class Solution {
-  static StringBuilder sb = new StringBuilder();
-  static int N;
-  static Point coporation;
-  static Point homePoint;
-  static Point[] points;
   static Scanner sc = new Scanner(System.in);
-  static boolean[] visited;
-  static int min_distance;
+  static int result; // 정답
+  static int N, M, K;
+  static int[][] graph;
+  static int MOV = 351;
+  static Queue<Cell> q;
+  static int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
   private static void input() {
     N = sc.nextInt();
-    coporation = new Point(sc.nextInt(), sc.nextInt());
-    homePoint = new Point(sc.nextInt(), sc.nextInt());
-    points = new Point[N + 1];
-    visited = new boolean[N + 1];
-    min_distance = Integer.MAX_VALUE;
+    M = sc.nextInt();
+    K = sc.nextInt();
+    q = new LinkedList<>();
 
-    for (int i = 1; i <= N; i++) {
-      points[i] = new Point(sc.nextInt(), sc.nextInt());
+    graph = new int[MOV][MOV];
+    for (int i = 0; i < MOV; i++) {
+      Arrays.fill(graph[i], -9999);
+    }
+
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < M; j++) {
+        int num = sc.nextInt();
+        graph[i][j] = num;
+        q.add(new Cell(num, num, i, j));
+      }
+    }
+
+  }
+
+  static void print(int[][] graph) {
+    for (int i = 0; i < 10; i++) {
+      for (int j = 0; j < 10; j++) {
+        System.out.print(graph[i][j] + " ");
+      }
+      System.out.println();
+    }
+  }
+
+  private static void bfs() {
+    while (!q.isEmpty()) {
+      Cell cell = q.poll();
+
+      //  비활성화 상태
+      if (cell.cnt > 0) {
+        q.add(new Cell(cell.cnt - 1, cell.value, cell.x, cell.y));
+        continue;
+      }
+
+      // 활성화 상태이면
+      if (cell.cnt == 0) {
+        for (int[] dir : dirs) {
+          int nx = cell.x + dir[0];
+          int ny = cell.y + dir[1];
+
+          if (nx < 0 || ny < 0 || nx >= MOV || ny >= MOV) continue;
+          // 자리에 셀이 있다면, 자리의 세포가, 탐색하는 세포보다 에너지가 크다면?
+//          if (graph[nx][ny] != -9999 && graph[nx][ny] < cell.value) {
+//            graph[nx][ny] = cell.value;
+//            q.add(new Cell(cell.value, cell.value, nx, ny));
+//          }
+//
+          if (graph[nx][ny] == -9999) {
+            graph[nx][ny] = cell.value;
+            q.add(new Cell(cell.value, cell.value, nx, ny));
+          }
+        }
+      }
     }
   }
 
   private static void pro() {
-    dfs(1, 0, coporation);
-  }
-
-  private static void dfs(int depth, int distance, Point lastPoint) {
-    if (distance >= min_distance) {
-      return;
-    }
-
-    if (depth == N + 1) {
-      // 모든 고객을 확인하고, 집으로 돌아가는 길
-      int final_distance = distance + distance(lastPoint, homePoint);
-      if (final_distance < min_distance) {
-        min_distance = final_distance;
-        return;
-      }
-    } else {
-      for (int i = 1; i <= N; i++) {
-        if (visited[i]) continue;
-        visited[i] = true;
-        int next_distance = distance + distance(lastPoint, points[i]);
-        dfs(depth + 1, next_distance, points[i]);
-        visited[i] = false;
-      }
-    }
-  }
-
-  private static int distance(final Point point1, final Point point2) {
-    return Math.abs(point1.x - point2.x) + Math.abs(point1.y - point2.y);
+    bfs();
+    print(graph);
   }
 
   public static void main(String args[]) throws Exception {
@@ -118,33 +126,21 @@ class Solution {
       input();
       pro();
 
-      System.out.printf("#%d %d\n", test_case, min_distance);
+      //#1 22
+      System.out.printf("#%d %d", T, result);
     }
   }
 
-  static class Edge implements Comparable<Edge> {
-    int start, end;
-    int weight;
-
-    public Edge(int start, int end, int weight) {
-      this.start = start;
-      this.end = end;
-      this.weight = weight;
-    }
-
-    @Override
-    public int compareTo(Edge o) {
-      if (this.weight != o.weight) {
-        return this.weight - o.weight;
-      }
-      return 0;
-    }
-  }
-
-  static class Point {
+  static class Cell {
+    // 1 : 비활성, 0 : 활성, -1 : 죽음
+    int cnt;
+    // 세포의 생명 에너지
+    int value;
     int x, y;
 
-    public Point(int x, int y) {
+    public Cell(int cnt, int value, int x, int y) {
+      this.cnt = cnt;
+      this.value = value;
       this.x = x;
       this.y = y;
     }
