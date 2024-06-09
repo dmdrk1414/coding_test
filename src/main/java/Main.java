@@ -1,36 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////////////////////
-// 기본 제공코드는 임의 수정해도 관계 없습니다. 단, 입출력 포맷 주의
-// 아래 표준 입출력 예제 필요시 참고하세요.
-// 표준 입력 예제
-// int a;
-// double b;
-// char g;
-// String var;
-// long AB;
-// a = sc.nextInt();                           // int 변수 1개 입력받는 예제
-// b = sc.nextDouble();                        // double 변수 1개 입력받는 예제
-// g = sc.nextByte();                          // char 변수 1개 입력받는 예제
-// var = sc.next();                            // 문자열 1개 입력받는 예제
-// AB = sc.nextLong();                         // long 변수 1개 입력받는 예제
-/////////////////////////////////////////////////////////////////////////////////////////////
-// 표준 출력 예제
-// int a = 0;                            
-// double b = 1.0;               
-// char g = 'b';
-// String var = "ABCDEFG";
-// long AB = 12345678901234567L;
-//System.out.println(a);                       // int 변수 1개 출력하는 예제
-//System.out.println(b); 		       						 // double 변수 1개 출력하는 예제
-//System.out.println(g);		       						 // char 변수 1개 출력하는 예제
-//System.out.println(var);		       				   // 문자열 1개 출력하는 예제
-//System.out.println(AB);		       				     // long 변수 1개 출력하는 예제
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
-import java.io.FileInputStream;
+import java.util.*;
 
 /*
    사용하는 클래스명이 Solution 이어야 하므로, 가급적 Solution.java 를 사용할 것을 권장합니다.
@@ -42,107 +10,100 @@ import java.io.FileInputStream;
 0 2
 
  */
-class Solution {
-  static Scanner sc = new Scanner(System.in);
-  static int result; // 정답
-  static int N, M, K;
-  static int[][] graph;
-  static int MOV = 351;
-  static Queue<Cell> q;
-  static int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+class Main {
+    static StringBuilder sb = new StringBuilder();
+    static int N;
+    static Point coporation;
+    static Point homePoint;
+    static Point[] points;
+    static Scanner sc = new Scanner(System.in);
+    static boolean[] visited;
+    static int min_distance;
 
-  private static void input() {
-    N = sc.nextInt();
-    M = sc.nextInt();
-    K = sc.nextInt();
-    q = new LinkedList<>();
+    private static void input() {
+        N = sc.nextInt();
+        coporation = new Point(sc.nextInt(), sc.nextInt());
+        homePoint = new Point(sc.nextInt(), sc.nextInt());
+        points = new Point[N + 1];
+        visited = new boolean[N + 1];
+        min_distance = Integer.MAX_VALUE;
 
-    graph = new int[MOV][MOV];
-    for (int i = 0; i < MOV; i++) {
-      Arrays.fill(graph[i], -9999);
+        for (int i = 1; i <= N; i++) {
+            points[i] = new Point(sc.nextInt(), sc.nextInt());
+        }
     }
 
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < M; j++) {
-        int num = sc.nextInt();
-        graph[i][j] = num;
-        q.add(new Cell(num, num, i, j));
-      }
-    }
-
-  }
-
-  static void print(int[][] graph) {
-    for (int i = 0; i < 10; i++) {
-      for (int j = 0; j < 10; j++) {
-        System.out.print(graph[i][j] + " ");
-      }
-      System.out.println();
+    private static void pro() {
+        dfs(1, 0, coporation);
     }
   }
 
   private static void bfs() {
     while (!q.isEmpty()) {
       Cell cell = q.poll();
-
-      //  비활성화 상태
-      if (cell.cnt > 0) {
-        q.add(new Cell(cell.cnt - 1, cell.value, cell.x, cell.y));
-        continue;
-      }
-
-      // 활성화 상태이면
-      if (cell.cnt == 0) {
-        for (int[] dir : dirs) {
-          int nx = cell.x + dir[0];
-          int ny = cell.y + dir[1];
-
-          if (nx < 0 || ny < 0 || nx >= MOV || ny >= MOV) continue;
-          // 자리에 셀이 있다면, 자리의 세포가, 탐색하는 세포보다 에너지가 크다면?
-//          if (graph[nx][ny] != -9999 && graph[nx][ny] < cell.value) {
-//            graph[nx][ny] = cell.value;
-//            q.add(new Cell(cell.value, cell.value, nx, ny));
-//          }
-//
-          if (graph[nx][ny] == -9999) {
-            graph[nx][ny] = cell.value;
-            q.add(new Cell(cell.value, cell.value, nx, ny));
-          }
+    private static void dfs(int depth, int distance, Point lastPoint) {
+        if (distance >= min_distance) {
+            return;
         }
-      }
+
+        if (depth == N + 1) {
+            // 모든 고객을 확인하고, 집으로 돌아가는 길
+            int final_distance = distance + distance(lastPoint, homePoint);
+            if (final_distance < min_distance) {
+                min_distance = final_distance;
+                return;
+            }
+        } else {
+            for (int i = 1; i <= N; i++) {
+                if (visited[i]) continue;
+                visited[i] = true;
+                int next_distance = distance + distance(lastPoint, points[i]);
+                dfs(depth + 1, next_distance, points[i]);
+                visited[i] = false;
+            }
+        }
     }
-  }
 
-  private static void pro() {
-    bfs();
-    print(graph);
-  }
-
-  public static void main(String args[]) throws Exception {
-    int T;
-    T = sc.nextInt();
-
-    for (int test_case = 1; test_case <= T; test_case++) {
-      input();
-      pro();
-
-      //#1 22
-      System.out.printf("#%d %d", T, result);
+    private static int distance(final Point point1, final Point point2) {
+        return Math.abs(point1.x - point2.x) + Math.abs(point1.y - point2.y);
     }
-  }
 
-  static class Cell {
-    // 1 : 비활성, 0 : 활성, -1 : 죽음
-    int cnt;
-    // 세포의 생명 에너지
-    int value;
-    int x, y;
+    public static void main(String args[]) throws Exception {
+        int T;
+        T = sc.nextInt();
 
-    public Cell(int cnt, int value, int x, int y) {
-      this.cnt = cnt;
-      this.value = value;
-      this.x = x;
-      this.y = y;
+        for (int test_case = 1; test_case <= T; test_case++) {
+            input();
+            pro();
+
+            System.out.printf("#%d %d\n", test_case, min_distance);
+        }
     }
-  }
+
+    static class Edge implements Comparable<Edge> {
+        int start, end;
+        int weight;
+
+        public Edge(int start, int end, int weight) {
+            this.start = start;
+            this.end = end;
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(Edge o) {
+            if (this.weight != o.weight) {
+                return this.weight - o.weight;
+            }
+            return 0;
+        }
+    }
+    static class Point {
+        int x, y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 }
