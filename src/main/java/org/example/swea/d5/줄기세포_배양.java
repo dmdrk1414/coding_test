@@ -120,8 +120,9 @@ class 줄기세포_배양 {
                   // 두개 이상의 줄기 세포가 셀에 동시에 번식하려고 하는 경우
                   // 생명력(LP)가 높은 줄기 세포가 셀을 차지
                   else if (map[nextMap][nx][ny].status == NONE_POSITION
-                    && map[nextMap][nx][ny].LP < map[curMap][xx][yy].LP)
+                    && map[nextMap][nx][ny].LP < map[curMap][xx][yy].LP) {
                     map[nextMap][nx][ny].LP = map[curMap][xx][yy].LP;
+                  }
                 }
               }
             }
