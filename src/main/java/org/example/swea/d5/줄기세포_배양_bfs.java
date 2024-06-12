@@ -108,6 +108,7 @@ class 줄기세포_배양_bfs {
 //					head.time++;
 //					liveCells.offer(head);
 //				}
+        
       }
     }
   }
