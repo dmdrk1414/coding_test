@@ -100,6 +100,7 @@ class 벽돌_깨기 {
   static int[][] graph;
   static int N, W, H;
   static int[][] dirs = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+  
 
   static void input() {
     result = 10000;
