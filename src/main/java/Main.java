@@ -47,7 +47,16 @@ public class Main {
   }
 
   public static void main(String[] args) throws IOException {
-    input();
-    pro();
+//    input();
+//    pro();
+
+    List<Integer> arr = new LinkedList<>();
+
+    arr.add(1);
+    arr.add(2);
+    arr.add(3);
+
+    System.out.println("arr.indexOf(2) = " + arr.indexOf(2));
+    System.out.println("arr = " + arr);
   }
 }
