@@ -3,28 +3,37 @@ import java.io.FileInputStream;
 
 import java.util.*;
 class Solution {
-  static final int MAX = 1000001;
-  static boolean[] visited;
-  static int N, P, max;
   static Scanner sc = new Scanner(System.in);
-  static int last;
+  static int N;
+  static String str, result;
+  static List<Sub> list;
+
+  /*
+10
+4
+monster
+
+   */
 
   static void input(){
     N = sc.nextInt();
-    P = sc.nextInt();
-    visited = new boolean[MAX];
-    last=0;
+    str = sc.next();
+    result = "";
 
-    for (int i = 0; i < N; i++) {
-      int num = sc.nextInt();
-      last = Math.max(last, num);
-      visited[num] = true;
+    list = new ArrayList<>();
+
+    for (int i = 0; i < str.length(); i++) {
+      list.add(new Sub(str.substring(i, str.length())));
     }
-    max = P+1;
+
+    Collections.sort(list);
+
+//    for (Sub s : list) {
+//      System.out.println("s = " + s.sub);
+//    }
   }
 
   static void pro(){
-    search(last);
   }
 
   public static void main(String args[]) {
@@ -35,30 +44,20 @@ class Solution {
       input();
       pro();
 
-      System.out.println("#" + test_case + " " + max);
+      System.out.printf("#%d %s\n",test_case, list.get(N - 1).sub);
     }
   }
 
-  public static void search(int last) {
-    int L = 1; int R = 1;
+  static class Sub implements Comparable<Sub>{
+    String sub;
 
-    while(R < last+1) {
-      if(visited[R]) {
-          R++;
-          max = Math.max(max, R - L);
-      } else {
-          if(P==0) {
-            max = Math.max(max, R - L);
+    public Sub(final String sub) {
+      this.sub = sub;
+    }
 
-              if (!visited[L]) {
-                P++;
-              }
-              L++;
-          } else {
-              P--;
-              R++;
-          }
-      }
+    @Override
+    public int compareTo(final Sub o) {
+      return sub.compareTo(o.sub);
     }
   }
 }
