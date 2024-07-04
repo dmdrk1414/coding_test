@@ -43,6 +43,7 @@ monster
       input();
       pro();
       System.out.printf("#%d %s\n",test_case, list.get(N - 1).sub);
+      
     }
   }
 
