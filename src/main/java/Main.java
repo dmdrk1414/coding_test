@@ -146,10 +146,9 @@ public class Main {
             // 더 큰 y값을 가지는 구슬이 뒤로 감
             if (curRy > curBy) newRy -= dy[i];
             else newBy -= dy[i];
-            
+
           }
         }
-
         // 두 구슬이 이동할 위치가 처음 방문하는 곳일 때만 큐에 추가
         if (!visited[newRx][newRy][newBx][newBy]) {
           visited[newRx][newRy][newBx][newBy] = true;
