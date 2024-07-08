@@ -1,243 +1,180 @@
-import java.io.IOException;
 import java.util.*;
+import java.io.*;
 
-class Solution {
-  /*
+/**
+ * 7 7
+ * #######
+ * #...RB#
+ * #.#####
+ * #.....#
+ * #####.#
+ * #O....#
+ * #######
+ * <p>
+ * 6 7
+ * #######
+ * #B....#
+ * #R....#
+ * #.....#
+ * #.....#
+ * #######
+ */
+public class Main {
+  static int N, M;
+  static char[][] map;
+  static boolean[][][][] visited;
+  static int holeX, holeY;
+  static Marble blue, red;
 
-1
-10
-0 1 0 3 0 0 0 0 7 0
-0 0 0 0 -1 0 5 0 0 0
-0 4 0 0 0 3 0 0 2 2
-1 0 0 0 1 0 0 3 0 0
-0 0 3 0 0 0 0 0 6 0
-3 0 0 0 2 0 0 1 0 0
-0 0 0 0 0 1 0 0 4 0
-0 5 0 4 1 0 7 0 0 5
-0 0 0 0 0 1 0 0 0 0
-2 0 6 0 0 4 0 0 0 4
+  static int[] dx = {-1, 0, 1, 0};
+  static int[] dy = {0, 1, 0, -1};
 
+  public static void main(String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    StringTokenizer st = new StringTokenizer(br.readLine());
 
-   */
-  static int EAST = 0, WEST = 1, SOUTH = 2, NORTH = 3;
-  static Scanner sc = new Scanner(System.in);
-  static int N;
-  static int[][] dir = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-  static int[][] graph;
-  static int ball_dir;
-  static int start_x, start_y;
-  static int fin_ball = -9;
-  static int[][] wamHolls;
-  static int MAX;
-  static int ans;
-  static List<int[]> starts;
+    N = Integer.parseInt(st.nextToken());
+    M = Integer.parseInt(st.nextToken());
 
-  private static void input() throws IOException {
-//    N = 5;
-    MAX = Integer.MIN_VALUE;
-    N = sc.nextInt();
-    graph = new int[N][N];
-    wamHolls = new int[N + 1][4];
-    starts = new ArrayList<>();
-    for (int i = 0; i <= N; i++) {
-      Arrays.fill(wamHolls[i], -1);
-    }
+    map = new char[N][M];
+    visited = new boolean[N][M][N][M];
+
+    // 구슬 map 구성
     for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        int num = sc.nextInt();
-        graph[i][j] = num;
-        if (num == 0) {
-          starts.add(new int[]{i, j});
-        }
-        if (num >= 6 && num <= 10) {
-          if (wamHolls[num][0] == -1) {
-            wamHolls[num][0] = i;
-            wamHolls[num][1] = j;
-          } else {
-            wamHolls[num][2] = i;
-            wamHolls[num][3] = j;
-          }
+      String str = br.readLine();
+      for (int j = 0; j < M; j++) {
+        map[i][j] = str.charAt(j);
+
+        if (map[i][j] == 'O') {
+          holeX = i;
+          holeY = j;
+        } else if (map[i][j] == 'B') {
+          blue = new Marble(0, 0, i, j, 0);
+        } else if (map[i][j] == 'R') {
+          red = new Marble(i, j, 0, 0, 0);
         }
       }
     }
-//    print(wamHolls);
-//    graph[0][3] = 3;
-//    graph[4][3] = -1;
-    start_x = 7;
-    start_y = 5;
-    ball_dir = EAST;
-//    ball_dir = WEST;
-//    ball_dir = SOUTH;
-//    ball_dir = NORTH;
+
+    System.out.println(bfs());
+
+    br.close();
   }
 
-  private static void bfs(final int x, final int y) {
-    Queue<Integer> q = new LinkedList<>();
-    q.add(x);
-    q.add(y);
-    ans = 0;
+  // BFS를 이용하여 탐색.  (최단거리를 찾아야하기 때문, 10 이하)
+  public static int bfs() {
+    Queue<Marble> queue = new LinkedList<>();
+    queue.add(new Marble(red.rx, red.ry, blue.bx, blue.by, 1));
+    visited[red.rx][red.ry][blue.rx][blue.ry] = true;
 
-    while (!q.isEmpty()) {
-      int xx = q.poll();
-      int yy = q.poll();
+    while (!queue.isEmpty()) {
+      Marble marble = queue.poll();
 
-//      System.out.println("현제 핀볼의 위치 \nxx: " + xx + ", yy: " + yy + " 현제 방향: " + ball_dir);
-      if (graph[xx][yy] == 0) {
-        graph[xx][yy] = fin_ball;
-        print(graph);
-        graph[xx][yy] = 0;
-      }
-//      System.out.println();
+      int curRx = marble.rx;
+      int curRy = marble.ry;
+      int curBx = marble.bx;
+      int curBy = marble.by;
+      int curCnt = marble.cnt;
 
-      // 현제 볼이 진행하는 방향
-      int nx = xx + dir[ball_dir][0];
-      int ny = yy + dir[ball_dir][1];
-      // 벽을 만났다.
-      if (nx < 0 || nx >= N) {
-        meet_wall();
-//        System.out.println("벽을 만났습니다. " + ball_dir + "으로 방향 전환했습니다.");
-        q.add(xx);
-        q.add(ny);
-        ans++;
-        continue;
-      }
-      if (ny < 0 || ny >= N) {
-        meet_wall();
-//        System.out.println("벽을 만났습니다. " + ball_dir + "으로 방향 전환했습니다.");
-        q.add(nx);
-        q.add(yy);
-        ans++;
-        continue;
-      }
-
-      // 핀볼 그리기
-      // 블록을 만난다.
-      int temp_stand = graph[nx][ny];
-      if (temp_stand >= 1 && temp_stand <= 5) {
-        valid_meet_block(temp_stand);
-        ans++;
-//        System.out.println("블록을 만났습니다. " + ball_dir + "으로 방향 전환했습니다.");
-//        System.out.println();
-      }
-
-      // 종료 조건
-      if (temp_stand == -1 || (nx == x && ny == y)) {
+      // 이동 횟수가 10 초과시 실패
+      if (curCnt > 10) {
         break;
       }
 
-      // 웜홀 만나기
-      if (temp_stand >= 6 && temp_stand <= 10) {
-//        System.out.println("웜홀을 만났습니다.");
-        if (nx == wamHolls[temp_stand][0] && ny == wamHolls[temp_stand][1]) {
-          nx = wamHolls[temp_stand][2];
-          ny = wamHolls[temp_stand][3];
-        } else {
-          nx = wamHolls[temp_stand][0];
-          ny = wamHolls[temp_stand][1];
+      for (int i = 0; i < 4; i++) {
+        int newRx = curRx;
+        int newRy = curRy;
+        int newBx = curBx;
+        int newBy = curBy;
+
+        boolean isRedHole = false;
+        boolean isBlueHole = false;
+
+        // 빨간 구슬 이동
+        // 벽을 만날 때까지 해당 방향으로 계속
+        while (map[newRx + dx[i]][newRy + dy[i]] != '#') {
+          newRx += dx[i];
+          newRy += dy[i];
+
+          // 이동 중 구멍을 만나면, flag값 기록
+          if (newRx == holeX && newRy == holeY) {
+            isRedHole = true;
+            break;
+          }
+        }
+
+        // 파란 구슬 이동
+        // 벽을 만날 때까지 해당 방향으로 계속
+        while (map[newBx + dx[i]][newBy + dy[i]] != '#') {
+          newBx += dx[i];
+          newBy += dy[i];
+
+          // 이동 중 구멍을 만나면, flag값 기록
+          if (newBx == holeX && newBy == holeY) {
+            isBlueHole = true;
+            break;
+          }
+        }
+
+        // 파란 구슬이 구멍에 들어가면 무조건 실패 -> 다음 큐 확인
+        if (isBlueHole) {
+          continue;
+        }
+
+        // 빨간 구슬만 구멍에 빠지면 성공
+        // 빨간 구슬만 성공하면 종료
+        if (isRedHole) {
+          return curCnt;
+        }
+
+        // 둘 다 구멍에 빠지지 않았는데 이동할 위치가 같은 경우 -> 위치 조정
+        // 빨간, 파란 구슬이 모두 같은 방향으로 벽까지 가기 때문에, 같은 좌표로 이동할 수 있음. 하지만, 한 좌표에는 하나의 구슬 만 있어야함
+        if (newRx == newBx && newRy == newBy) {
+          if (i == 0) { // 위쪽으로 기울이기
+            // 더 큰 x값을 가지는 구슬이 뒤로 감
+            if (curRx > curBx) newRx -= dx[i];
+            else newBx -= dx[i];
+          } else if (i == 1) { // 오른쪽으로 기울이기
+            // 더 작은 y값을 가지는 구슬이 뒤로 감
+            if (curRy < curBy) newRy -= dy[i];
+            else newBy -= dy[i];
+          } else if (i == 2) { // 아래쪽으로 기울이기
+            // 더 작은 x값을 가지는 구슬이 뒤로 감
+            if (curRx < curBx) newRx -= dx[i];
+            else newBx -= dx[i];
+          } else { // 왼쪽으로 기울이기
+            // 더 큰 y값을 가지는 구슬이 뒤로 감
+            if (curRy > curBy) newRy -= dy[i];
+            else newBy -= dy[i];
+            
+          }
+        }
+
+        // 두 구슬이 이동할 위치가 처음 방문하는 곳일 때만 큐에 추가
+        if (!visited[newRx][newRy][newBx][newBy]) {
+          visited[newRx][newRy][newBx][newBy] = true;
+          queue.add(new Marble(newRx, newRy, newBx, newBy, curCnt + 1));
         }
       }
-
-      q.add(nx);
-      q.add(ny);
-    }
-    MAX = Math.max(MAX, ans);
-    System.out.println(ans);
-//    System.out.println("핀볼 종료");
-  }
-
-  private static void pro() {
-    for (int[] start : starts) {
-      System.out.println(Arrays.toString(start));
-      bfs(start[0], start[1]);
-    }
-  }
-
-  static void meet_wall() {
-    if (ball_dir == EAST) ball_dir = WEST;
-    else if (ball_dir == WEST) ball_dir = EAST;
-    else if (ball_dir == SOUTH) ball_dir = NORTH;
-    else if (ball_dir == NORTH) ball_dir = SOUTH;
-  }
-
-  static void valid_meet_block(int type) {
-    if (type == 1) one_meet_block();
-    if (type == 2) two_meet_block();
-    if (type == 3) three_meet_block();
-    if (type == 4) four_meet_block();
-    if (type == 5) five_meet_block();
-  }
-
-  static void one_meet_block() {
-    if (ball_dir == EAST) ball_dir = WEST;
-    else if (ball_dir == NORTH) ball_dir = SOUTH;
-    else if (ball_dir == WEST) ball_dir = NORTH;
-    else if (ball_dir == SOUTH) ball_dir = EAST;
-  }
-
-  static void two_meet_block() {
-    if (ball_dir == EAST) ball_dir = WEST;
-    else if (ball_dir == SOUTH) ball_dir = NORTH;
-    else if (ball_dir == NORTH) ball_dir = EAST;
-    else if (ball_dir == WEST) ball_dir = SOUTH;
-  }
-
-  static void three_meet_block() {
-    if (ball_dir == SOUTH) ball_dir = NORTH;
-    else if (ball_dir == WEST) ball_dir = EAST;
-    else if (ball_dir == EAST) ball_dir = SOUTH;
-    else if (ball_dir == NORTH) ball_dir = WEST;
-  }
-
-  static void four_meet_block() {
-    if (ball_dir == WEST) ball_dir = EAST;
-    else if (ball_dir == NORTH) ball_dir = SOUTH;
-    else if (ball_dir == EAST) ball_dir = NORTH;
-    else if (ball_dir == SOUTH) ball_dir = WEST;
-  }
-
-  static void five_meet_block() {
-    if (ball_dir == EAST) ball_dir = WEST;
-    else if (ball_dir == WEST) ball_dir = EAST;
-    else if (ball_dir == SOUTH) ball_dir = NORTH;
-    else if (ball_dir == NORTH) ball_dir = SOUTH;
-  }
-
-  public static void main(String args[]) throws Exception {
-    int T = 1;
-    T = sc.nextInt();
-
-    for (int test_case = 1; test_case <= T; test_case++) {
-      input();
-      pro();
-    }
-  }
-
-  static void print(int x, int y) {
-    System.out.println("============");
-    System.out.println(x + " " + y);
-  }
-
-  static void print(int[][] arr) {
-    for (int[] ints : arr) {
-      System.out.println(Arrays.toString(ints));
-    }
-    System.out.println();
-  }
-
-  static class WamHoll {
-    int x, y;
-    int num;
-    WamHoll linkWamHoll;
-
-    public WamHoll(int x, int y, int num) {
-      this.x = x;
-      this.y = y;
-      this.num = num;
-      this.linkWamHoll = null;
     }
 
-    public void link(WamHoll wamHoll) {
-      this.linkWamHoll = wamHoll;
-    }
+    return -1;
+  }
+
+}
+
+class Marble {
+  int rx;
+  int ry;
+  int bx;
+  int by;
+  int cnt;
+
+  Marble(int rx, int ry, int bx, int by, int cnt) {
+    this.rx = rx;
+    this.ry = ry;
+    this.bx = bx;
+    this.by = by;
+    this.cnt = cnt;
   }
 }
