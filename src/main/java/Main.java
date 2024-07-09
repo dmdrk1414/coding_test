@@ -1,62 +1,216 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
 
 /**
- 6
- 10
- 20
- 15
- 25
- 10
- 20
+ 7 7
+ #######
+ #...RB#
+ #.#####
+ #.....#
+ #####.#
+ #O....#
+ #######
+
+ 6 7
+ #######
+ #B....#
+ #R....#
+ #.....#
+ #.....#
+ #######
 
  */
-
 public class Main {
-  static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-  static int N;
-  static int ONE = 0, TWO = 1;
-  static int[] arr;
-  static int[][] dp;
+  static int N, M;
+  static char[][] map;
+  static boolean[][][][] visited;
+  static int holeX, holeY;
+  static Balls blue, red;
+  static int RED = 1, BLUE = 2;
 
-  private static void input() throws IOException {
-    N = Integer.parseInt(br.readLine().trim());
-    arr = new int[N + 1];
-    dp = new int[N + 1][2];
-
-    for (int i = 1; i <= N; i++) {
-      arr[i] = Integer.parseInt(br.readLine().trim());
-    }
-    System.out.println("Arrays.toString(arr) = " + Arrays.toString(arr));
-  }
-
-  private static void pro() {
-    dp[1][ONE] = arr[1];
-    dp[1][TWO] = 0;
-
-    if (N >=2){
-      dp[2][ONE] = arr[1] + arr[2];
-      dp[2][TWO] = arr[2];
-    }
-
-    for (int i = 3; i <= N ; i++) {
-      dp[i][ONE] = dp[i - 1][TWO] + arr[i];
-      dp[i][TWO] = Math.max(dp[i - 2][ONE], dp[i - 2][TWO]) + arr[i];
-    }
-
-  }
+  static int[] dx = {-1, 0, 1, 0};
+  static int[] dy = {0, 1, 0, -1};
 
   public static void main(String[] args) throws IOException {
-//    input();
-//    pro();
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    StringTokenizer st = new StringTokenizer(br.readLine());
 
-    List<Integer> arr = new LinkedList<>();
+    N = Integer.parseInt(st.nextToken());
+    M = Integer.parseInt(st.nextToken());
 
-    arr.add(1);
-    arr.add(2);
-    arr.add(3);
+    map = new char[N][M];
+    visited = new boolean[N][M][N][M];
 
-    System.out.println("arr.indexOf(2) = " + arr.indexOf(2));
-    System.out.println("arr = " + arr);
+    // 구슬 map 구성
+    for(int i = 0; i < N; i++) {
+      String str = br.readLine();
+      for(int j = 0; j < M; j++) {
+        map[i][j] = str.charAt(j);
+
+        if(map[i][j] == 'O') {
+          holeX = i;
+          holeY = j;
+        } else if(map[i][j] == 'B') {
+          blue = new Balls(0, 0, i, j, 0);
+        } else if(map[i][j] == 'R') {
+          red = new Balls(i, j, 0, 0, 0);
+        }
+      }
+    }
+
+    System.out.println(bfs());
+
+    br.close();
+  }
+
+  // BFS를 이용하여 탐색.  (최단거리를 찾아야하기 때문, 10 이하)
+  public static int bfs() {
+    Queue<Balls> queue = new LinkedList<>();
+    queue.add(new Balls(red.rx, red.ry, blue.bx, blue.by, 1));
+    visited[red.rx][red.ry][blue.rx][blue.ry] = true;
+
+    while(!queue.isEmpty()) {
+      Balls marble = queue.poll();
+
+      int curRx = marble.rx;
+      int curRy = marble.ry;
+      int curBx = marble.bx;
+      int curBy = marble.by;
+      int curCnt = marble.cnt;
+
+      // 이동 횟수가 10 초과시 실패
+      if(curCnt > 10) {
+        break;
+      }
+
+      for(int i = 0; i < 4; i++) {
+        int newRx = curRx;
+        int newRy = curRy;
+        int newBx = curBx;
+        int newBy = curBy;
+
+        boolean isRedHole = false;
+        boolean isBlueHole = false;
+
+        // 빨간 구슬 이동
+        // 벽을 만날 때까지 해당 방향으로 계속
+        while(map[newRx + dx[i]][newRy + dy[i]] != '#') {
+          newRx += dx[i];
+          newRy += dy[i];
+
+          // 이동 중 구멍을 만나면, flag값 기록
+          if(newRx == holeX && newRy == holeY) {
+            isRedHole = true;
+            break;
+          }
+        }
+
+        // 파란 구슬 이동
+        // 벽을 만날 때까지 해당 방향으로 계속
+        while(map[newBx + dx[i]][newBy + dy[i]] != '#') {
+          newBx += dx[i];
+          newBy += dy[i];
+
+          // 이동 중 구멍을 만나면, flag값 기록
+          if(newBx == holeX && newBy == holeY) {
+            isBlueHole = true;
+            break;
+          }
+        }
+
+        // 파란 구슬이 구멍에 들어가면 무조건 실패 -> 다음 큐 확인
+        if(isBlueHole) {
+          continue;
+        }
+
+        // 빨간 구슬만 구멍에 빠지면 성공
+        if(isRedHole) {
+          return curCnt;
+        }
+        // 둘 다 구멍에 빠지지 않았는데 이동할 위치가 같은 경우 -> 위치 조정
+        // 빨간, 파란 구슬이 모두 같은 방향으로 벽까지 가기 때문에, 같은 좌표로 이동할 수 있음. 하지만, 한 좌표에는 하나의 구슬 만 있어야함
+        if(newRx == newBx && newRy == newBy) {
+          if(i == 0) { // 위쪽으로 기울이기
+            // 더 큰 x값을 가지는 구슬이 뒤로 감
+            if(curRx > curBx) newRx -= dx[i];
+            else newBx -= dx[i];
+          } else if(i == 1) { // 오른쪽으로 기울이기
+            // 더 작은 y값을 가지는 구슬이 뒤로 감
+            if(curRy < curBy) newRy -= dy[i];
+            else newBy -= dy[i];
+          } else if(i == 2) { // 아래쪽으로 기울이기
+            // 더 작은 x값을 가지는 구슬이 뒤로 감
+            if(curRx < curBx) newRx -= dx[i];
+            else newBx -= dx[i];
+          } else { // 왼쪽으로 기울이기
+            // 더 큰 y값을 가지는 구슬이 뒤로 감
+            if(curRy > curBy) newRy -= dy[i];
+            else newBy -= dy[i];
+          }
+        }
+
+        // 두 구슬이 이동할 위치가 처음 방문하는 곳일 때만 큐에 추가
+        if(!visited[newRx][newRy][newBx][newBy]) {
+          visited[newRx][newRy][newBx][newBy] = true;
+          queue.add(new Balls(newRx, newRy, newBx, newBy, curCnt+1));
+        }
+      }
+    }
+
+    return -1;
+  }
+
+  static class Balls {
+    int rx;
+    int ry;
+    int bx;
+    int by;
+    int cnt;
+    boolean redHall, blueHall;
+
+    Balls(int rx, int ry, int bx, int by, int cnt) {
+      this.rx = rx;
+      this.ry = ry;
+      this.bx = bx;
+      this.by = by;
+      this.cnt = cnt;
+      this.redHall = false;
+      this.blueHall = false;
+    }
+
+    public void move(int dir, int type){
+      boolean isHolle = false;
+      int newRx = 0;
+      int newRy = 0;
+      if(type == RED) {
+        newRx = this.rx;
+        newRy = this.ry;
+      }else if(type == BLUE) {
+        newRx = this.bx;
+        newRy = this.by;
+      }
+      // 빨간 구슬 이동
+      // 벽을 만날 때까지 해당 방향으로 계속
+      while(map[newRx + dx[dir]][newRy + dy[dir]] != '#') {
+        newRx += dx[dir];
+        newRy += dy[dir];
+
+        // 이동 중 구멍을 만나면, flag값 기록
+        if(newRx == holeX && newRy == holeY) {
+          isHolle = true;
+          break;
+        }
+      }
+
+      if(type == RED) {
+        this.rx = newRx;
+        this.ry = newRy;
+        this.redHall = isHolle;
+      }else if(type == BLUE) {
+        this.bx = newRx;
+        this.by = newRy;
+        this.blueHall = isHolle;
+      }
+    }
   }
 }
