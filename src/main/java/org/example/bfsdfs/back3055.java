@@ -84,6 +84,7 @@ public class back3055 {
         dist_hedgehog[i][j] = -1;
         visit[i][j] = false;
         if (a[i].charAt(j) == 'S') {
+          
           Q.add(i);
           Q.add(j);
           dist_hedgehog[i][j] = 0;
