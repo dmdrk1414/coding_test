@@ -1,54 +1,58 @@
 import java.util.Scanner;
 import java.util.Stack;
 
+/**
+ 2 12
+
+1 100
+
+ 1
+ 1 : 1, 1
+
+ 3
+ 2 : 10, 1
+ 3 : 11, 2, 4
+ 8
+ 4 : 100, 1, 5
+ 5 : 101, 2, 7
+ 6 : 110, 2, 9
+ 7 : 111, 3, 12
+
+ 20
+ 8 : 1000, 1, 13
+ 9 : 1001, 2, 15
+ 10 : 1010, 2, 17
+ 11 : 1011, 3, 20
+ 12 : 1100, 2, 22
+ 13 : 1101, 3, 25
+ 14 : 1110, 3, 28
+ 15 : 1111, 4, 32
+ */
 public class Main {
-    static Scanner scanner = new Scanner(System.in);
-    static Stack<Integer> later, repeat;
-    static String input;
-    static int result;
+    static Scanner sc = new Scanner(System.in);
+    static int N, M;
 
     private static void input() {
-        later = new Stack<>();
-        repeat = new Stack<>();
-        input = scanner.nextLine();
+        N = sc.nextInt();
+        M = sc.nextInt();
+
+//        N = 1;
+//        M = 100;
     }
 
     private static void pro() {
-        if (input.length() == 1) {
-            System.out.println(1);
-            return;
-        }
+        int total  = 0;
+        for (int i = N; i <= M; i++) {
+            int cnt = 0;
 
-        int lenCnt = 0; // 만약 현제 숫자이면 문자열 길이 넣기
-        int k_num = 0; // 닫힘 괄호을 만날때 곱해야하는 숫자
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            // 숫자이면
-            if (Character.isDigit(c)) {
-                lenCnt++;
-                k_num = c - '0';
+            String test = Integer.toBinaryString(i);
+            for (char c : test.toCharArray()) {
+                if(c == '1') cnt++;
             }
-            // 숫자가 아니면
-            else if(c == '('){
-                later.add(--lenCnt);
-                repeat.add(k_num); // )을 만날때 반복하는 숫자 등록
-                lenCnt = 0;
-            } else if (c == ')') {
-                if(lenCnt >0)
-                    later.add(lenCnt);
-                lenCnt = 0;
-                int len = later.pop();
-                int repeatCnt = repeat.pop();
-                int cnt = len * repeatCnt; // )을 만나고 반복하는 숫자 * 이전의 숫자을 곱한
-                int nextTempLater = 0;
 
-                nextTempLater = later.pop() + cnt;
-                later.add(nextTempLater);
-                result = nextTempLater;
-
-            }
+            total += cnt;
+            System.out.printf("%3d : %s, %d, %d\n", i, test, cnt, total);
         }
-        System.out.println(result);
     }
 
     public static void main(String[] args) {
