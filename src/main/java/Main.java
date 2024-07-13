@@ -2,57 +2,72 @@ import java.util.Scanner;
 import java.util.Stack;
 
 /**
- 2 12
+7
+1 2 1 3 1 2 1
+4
+1 3
+2 5
+3 3
+5 7
 
-1 100
-
- 1
- 1 : 1, 1
-
- 3
- 2 : 10, 1
- 3 : 11, 2, 4
- 8
- 4 : 100, 1, 5
- 5 : 101, 2, 7
- 6 : 110, 2, 9
- 7 : 111, 3, 12
-
- 20
- 8 : 1000, 1, 13
- 9 : 1001, 2, 15
- 10 : 1010, 2, 17
- 11 : 1011, 3, 20
- 12 : 1100, 2, 22
- 13 : 1101, 3, 25
- 14 : 1110, 3, 28
- 15 : 1111, 4, 32
+팰린드롬인 경우에는 1, 아닌 경우에는 0을 출력한다.
  */
 public class Main {
     static Scanner sc = new Scanner(System.in);
-    static int N, M;
+    static int N;
+    static int[] arr;
+    static int M;
+    static int[][] target;
+    static int[][] visited;
 
     private static void input() {
         N = sc.nextInt();
+        arr = new int[N];
+        for (int i = 0; i < N; i++) {
+            arr[i] = sc.nextInt();
+        }
         M = sc.nextInt();
+        target = new int[M][2];
+        visited = new int[N][N];
 
-//        N = 1;
-//        M = 100;
+        for (int i = 0; i < M; i++) {
+            target[i][0] = sc.nextInt() - 1;
+            target[i][1] = sc.nextInt() - 1;
+        }
     }
 
     private static void pro() {
-        int total  = 0;
-        for (int i = N; i <= M; i++) {
-            int cnt = 0;
+        for (int i = 0; i < N; i++) {
+            for (int j = i; j < N; j++) {
+                int flag = 1;
+                int start = i; int end = j;
 
-            String test = Integer.toBinaryString(i);
-            for (char c : test.toCharArray()) {
-                if(c == '1') cnt++;
+                while (start <= end) {
+                    if (arr[start++] != arr[end--]) {
+                        flag = 0;
+                        break;
+                    }
+                }
+
+                if (flag == 1) {
+                    visited[i][j] = flag;
+                }
             }
-
-            total += cnt;
-            System.out.printf("%3d : %s, %d, %d\n", i, test, cnt, total);
         }
+
+        for (int[] booleans : visited) {
+            for (int aBoolean : booleans) {
+                System.out.print(aBoolean + " ");
+            }
+            System.out.println();
+        }
+
+//        for (int i = 0; i < target.length; i++) {
+//            int one = target[i][0];
+//            int two = target[i][1];
+//
+//            System.out.println(visited[one][two]);
+//        }
     }
 
     public static void main(String[] args) {
