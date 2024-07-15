@@ -9,7 +9,6 @@ import java.util.Stack;
 2 5
 3 3
 5 7
-
 팰린드롬인 경우에는 1, 아닌 경우에는 0을 출력한다.
  */
 public class Main {
