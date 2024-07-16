@@ -51,6 +51,7 @@ public class Main {
       } else if (a == 2) {
 //        a가 2인 경우에는 b(1 ≤ b ≤ N)번째 수부터 c(b ≤ c ≤ N)번째 수까지의 합을 구하여 출력하면 된다.
 //        sumRec(b, (int) c, 1, 1, N);
+        
       }
     }
   }
