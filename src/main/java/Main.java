@@ -1,76 +1,131 @@
-import java.util.Scanner;
-import java.util.Stack;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 /**
-7
-1 2 1 3 1 2 1
+5 2 2
+1
+2
+3
 4
-1 3
-2 5
-3 3
-5 7
-팰린드롬인 경우에는 1, 아닌 경우에는 0을 출력한다.
+5
+1 3 6
+2 2 5
+1 5 2
+2 3 5
+
  */
 public class Main {
-    static Scanner sc = new Scanner(System.in);
-    static int N;
-    static int[] arr;
-    static int M;
-    static int[][] target;
-    static int[][] visited;
+    static long[] arr, tree;
 
-    private static void input() {
-        N = sc.nextInt();
-        arr = new int[N];
-        for (int i = 0; i < N; i++) {
-            arr[i] = sc.nextInt();
+    public static void main(String[] args) throws NumberFormatException, IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
+        int K = Integer.parseInt(st.nextToken());
+
+        arr = new long[N + 1];
+        for (int i = 1; i <= N; i++) {
+            arr[i] = Long.parseLong(br.readLine());
         }
-        M = sc.nextInt();
-        target = new int[M][2];
-        visited = new int[N][N];
 
-        for (int i = 0; i < M; i++) {
-            target[i][0] = sc.nextInt() - 1;
-            target[i][1] = sc.nextInt() - 1;
-        }
-    }
+        // 사이즈를 구하는 위의 과정이 귀찮으면, 단순히 N에 4를 곱한 사이즈를 사용해도 무방함.
+        tree = new long[N * 4];
 
-    private static void pro() {
-        for (int i = 0; i < N; i++) {
-            for (int j = i; j < N; j++) {
-                int flag = 1;
-                int start = i; int end = j;
+        init(1, N, 1);
 
-                while (start <= end) {
-                    if (arr[start++] != arr[end--]) {
-                        flag = 0;
-                        break;
-                    }
-                }
+        System.out.println("Arrays.toString(tree) = " + Arrays.toString(tree));
 
-                if (flag == 1) {
-                    visited[i][j] = flag;
-                }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < M + K; i++) {
+            st = new StringTokenizer(br.readLine());
+
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            long c = Long.parseLong(st.nextToken());
+
+            if (a == 1) {
+                long dif = c - arr[b];
+                arr[b] = c;
+                update(1, N, 1, b, dif);
+                System.out.println("Arrays.toString(tree) = " + Arrays.toString(tree));
+            } else if (a == 2) {
+                sb.append(sum(1, N, 1, b, (int) c) + "\n");
             }
         }
 
-        for (int[] booleans : visited) {
-            for (int aBoolean : booleans) {
-                System.out.print(aBoolean + " ");
-            }
-            System.out.println();
+        bw.write(sb.toString());
+        bw.flush();
+        bw.close();
+        br.close();
+    }
+
+    // start: 시작 인덱스, end: 끝 인덱스
+    public static long init(int start, int end, int node) {
+        // 리프 노드 관리
+        if (start == end) {
+            return tree[node] = arr[start];
         }
 
-//        for (int i = 0; i < target.length; i++) {
-//            int one = target[i][0];
-//            int two = target[i][1];
-//
-//            System.out.println(visited[one][two]);
-//        }
+        // 중간 값
+        int mid = start + (end - start) / 2;
+
+        // 재귀적으로 두 부분으로 나눈 뒤에 그 합을 자기 자신으로 함.
+        return tree[node] = init(start, mid, node * 2) + init(mid + 1, end, node * 2 + 1);
     }
 
-    public static void main(String[] args) {
-        input();
-        pro();
+    // start: 시작 인덱스, end: 끝 인덱스
+    // left, right: 구간 합을 구하고자 하는 범위
+    // sum(1, N, 1, b, (int) c);
+    // sum(1, N, 1, 2, 5);
+
+    // start = 1, end = N
+    // left = 2, right = 5
+    public static long sum(int start, int end, int node, int left, int right) {
+        // 범위 밖에 있는 경우
+        if(end < left || right < start){
+            return 0;
+        }
+
+
+
+        // 범위 안에 있는 경우
+        if(left <= start && end <= right){
+            return tree[node];
+        }
+
+        // 그렇지 않다면, 두 부분으로 나누어 합을 구하기
+        int mid = start + (end - start) / 2;
+        return sum(start, mid, node * 2, left, right)
+          + sum (mid + 1, end, node * 2 + 1, left, right);
     }
+
+    // start: 시작 인덱스, end: 끝 인덱스
+    // idx: 구간 합을 수정하고자 하는 노드
+    // dif: 수정할 값
+    public static void update(int start, int end, int node, int idx, long dif) {
+        // 범위 밖에 있는 경우
+        if (idx < start || idx > end) {
+            return;
+        }
+
+        // 범위 안에 있으면 내려가며 다른 원소도 갱신
+        tree[node] += dif;
+        if (start == end) {
+            return;
+        }
+
+        int mid = (start + end) / 2;
+        update(start, mid, node * 2, idx, dif);
+        update(mid + 1, end, node * 2 + 1, idx, dif);
+    }
+
 }
