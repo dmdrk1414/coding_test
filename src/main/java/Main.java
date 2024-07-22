@@ -20,7 +20,6 @@ class Child extends Parent {
         super(x+1, x);
         this.x=x;
     }
-
     int getT(int n){
         return super.getT()+n;
     }
