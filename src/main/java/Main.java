@@ -11,8 +11,6 @@ class Parent {
     }
 }
 
-
-
 class Child extends Parent {
     int x;
 
