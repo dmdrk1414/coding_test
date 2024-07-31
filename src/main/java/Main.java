@@ -1,79 +1,67 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 /**
- 7 7
- #######
- #...RB#
- #.#####
- #.....#
- #####.#
- #O....#
- #######
-
- 6 7
- #######
- #B....#
- #R....#
- #.....#
- #.....#
- #######
+ 4
+ 0 10 15 20
+ 5 0 9 10
+ 6 13 0 12
+ 8 8 9 0
 
  */
+
 public class Main {
-  static int N, M, K;
-  static Scanner sc = new Scanner(System.in);
-  static long[] tree, arr;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    static StringTokenizer st;
+    static int n;
+    static int[][] map;
+    static int[][] dp;
+    static final int INF = 11000000;
 
-  private static void input() {
-    N = sc.nextInt();
-    M = sc.nextInt();
-    K = sc.nextInt();
-    arr = new long[N + 1];
-    tree = new long[N * 4];
+    private static void input() throws IOException {
+        st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        map = new int[n][n];
+        dp = new int[n][(1 << n) ];
 
-
-    for (int i = 1; i <= N; i++) {
-      arr[i] = sc.nextLong();
+        for (int i = 0; i < n; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < n; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
     }
 
-    initTree(1, 1, N);
-    System.out.println("Arrays.toString(tree) = " + Arrays.toString(tree));
+    private static void pro() {
+        // dp배열 초기화
+        for(int i = 0; i < n; i++) {
+            Arrays.fill(dp[i], INF);
+        }
 
-    for (int i = 0; i < M + K; i++) {
-      int a = sc.nextInt();
-      int b = sc.nextInt();
-      long c = sc.nextLong();
-
-      if (a == 1) {
-//        a가 1인 경우 b(1 ≤ b ≤ N)번째 수를 c로 바꾸고
-//        update(b, c, 1, 1, N);
-      } else if (a == 2) {
-//        a가 2인 경우에는 b(1 ≤ b ≤ N)번째 수부터 c(b ≤ c ≤ N)번째 수까지의 합을 구하여 출력하면 된다.
-//        sumRec(b, (int) c, 1, 1, N);
-        
-      }
+        System.out.println(recur(0, 1));
     }
-  }
 
-  private static long initTree(final int node, final int left, final int right) {
-      if(left == right) {
-        return tree[node] = arr[left];
-      }
+    private static int recur(final int city, final int visitBitmask) {
+        if (visitBitmask == (1 << n) - 1) {
+            return map[city][0];
+        }
 
-      int mid = left + (right - left) / 2;
-      long leftVal = initTree(node * 2, left, mid);
-      long rightVal = initTree(node * 2 + 1, mid + 1, right);
+        if(dp[city][visitBitmask] != INF) {	// dp값이 존재하는경우
+            return dp[city][visitBitmask];
+        }
 
-      return tree[node] = leftVal + rightVal;
-  }
+        for (int i = 0; i < n; i++) {
+            if((visitBitmask & (1 << i) ) == 0 && map[city][i] != 0) {
+                dp[city][visitBitmask] = Math.min(dp[city][visitBitmask], recur(i, visitBitmask | (1 << i)) + map[city][i]);
+            }
+        }
 
-  private static void pro() {
+        return dp[city][visitBitmask];
+    }
 
-  }
-
-  public static void main(String[] args) {
-    input();
-    pro();
-  }
+    public static void main(String[] args) throws IOException {
+        input();
+        pro();
+    }
 }
