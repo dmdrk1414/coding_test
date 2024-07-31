@@ -38,7 +38,6 @@ public class Main {
         for(int i = 0; i < n; i++) {
             Arrays.fill(dp[i], INF);
         }
-
         System.out.println(recur(0, 1));
     }
 
