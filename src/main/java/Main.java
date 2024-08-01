@@ -2,11 +2,11 @@ import java.io.*;
 import java.util.*;
 
 /**
+ 5
  4
- 0 10 15 20
- 5 0 9 10
- 6 13 0 12
- 8 8 9 0
+ 1 3 1 2
+ 3
+ 1 3 2
 
  */
 
@@ -14,53 +14,109 @@ public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
     static StringTokenizer st;
-    static int n;
-    static int[][] map;
-    static int[][] dp;
-    static final int INF = 11000000;
+    static int T, N, M;
+    static long[] a_sum, b_sum;
+    static int[] a_arr, b_arr;
+    static long result;
 
     private static void input() throws IOException {
         st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        map = new int[n][n];
-        dp = new int[n][(1 << n) ];
+        T = Integer.parseInt(st.nextToken());
 
-        for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < n; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-            }
+        st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        result = 0;
+        a_arr = new int[N];
+        a_sum = new long[N * (N + 1) / 2];
+
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < N; i++) {
+            a_arr[i] = Integer.parseInt(st.nextToken());
+        }
+
+        st = new StringTokenizer(br.readLine());
+        M = Integer.parseInt(st.nextToken());
+        b_arr = new int[M];
+        b_sum = new long[M * (M + 1) / 2];
+
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < M; i++) {
+            b_arr[i] = Integer.parseInt(st.nextToken());
         }
     }
 
-    private static void pro() {
-        // dp배열 초기화
-        for(int i = 0; i < n; i++) {
-            Arrays.fill(dp[i], INF);
+    private static void pro() throws IOException {
+        make_sum(a_sum, N, a_arr);
+        make_sum(b_sum, M, b_arr);
+
+        for (int i = 0; i < a_sum.length;) {
+            long a_target = a_sum[i];
+            long b_target = T - a_target;
+
+            long a_term = upper_bound(a_sum, a_target) - lower_bound(a_sum, a_target);
+            long b_term = upper_bound(b_sum, b_target) - lower_bound(b_sum, b_target);
+
+            result += a_term * b_term;
+            i += a_term;
         }
-        System.out.println(recur(0, 1));
+
+        // 0도 가능
+        bw.write(result + "");
     }
 
-    private static int recur(final int city, final int visitBitmask) {
-        if (visitBitmask == (1 << n) - 1) {
-            return map[city][0];
-        }
+    private static long upper_bound(long[] arr, long target) {
+        int L = 0, R = arr.length - 1;
 
-        if(dp[city][visitBitmask] != INF) {	// dp값이 존재하는경우
-            return dp[city][visitBitmask];
-        }
+        while(L < R) {
+            int mid = L + (R - L) / 2;
 
-        for (int i = 0; i < n; i++) {
-            if((visitBitmask & (1 << i) ) == 0 && map[city][i] != 0) {
-                dp[city][visitBitmask] = Math.min(dp[city][visitBitmask], recur(i, visitBitmask | (1 << i)) + map[city][i]);
+            if (target >= arr[mid]) {
+                L = mid + 1;
+            } else {
+                R = mid;
             }
         }
 
-        return dp[city][visitBitmask];
+        return L;
+    }
+
+    private static long lower_bound(long[] arr, long target) {
+        int L = 0, R = arr.length - 1;
+
+        while(L < R) {
+            int mid = L + (R - L) / 2;
+
+            if (target <= arr[mid]) {
+                R = mid;
+            } else {
+                L = mid + 1;
+            }
+        }
+
+        return L;
+    }
+
+    private static void make_sum( long[] sum,  int n,  int[] arr) {
+        int idx = 0;
+
+        for (int i = 0; i < n; i++) {
+            int temp = 0;
+
+            for (int j = i; j < n; j++) {
+                temp += arr[j];
+                sum[idx++] = temp;
+            }
+        }
+
+        Arrays.sort(sum);
     }
 
     public static void main(String[] args) throws IOException {
         input();
         pro();
+
+        bw.flush();
+        bw.close();
+        br.close();
     }
 }
