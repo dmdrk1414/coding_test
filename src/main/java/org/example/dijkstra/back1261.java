@@ -11,7 +11,6 @@ public class back1261 {
   public static void main(String[] args) throws IOException {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     String str = br.readLine();
-
     int dp[] = new int[str.length() + 1];
 
     dp[0] = 1;
