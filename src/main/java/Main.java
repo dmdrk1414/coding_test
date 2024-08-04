@@ -23,8 +23,6 @@ class Child extends Parent {
     }
 }
 
-
-
 class Main {
     public static void main(String[] args) {
         Parent parent = new Child(3);
