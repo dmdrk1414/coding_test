@@ -2,11 +2,14 @@ import java.io.*;
 import java.util.*;
 
 /**
- 5
- 4
- 1 3 1 2
- 3
- 1 3 2
+ 8
+ 1 2
+ 1 3
+ 1 4
+ 2 5
+ 2 6
+ 4 7
+ 4 8
 
  */
 
@@ -14,101 +17,55 @@ public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
     static StringTokenizer st;
-    static int T, N, M;
-    static long[] a_sum, b_sum;
-    static int[] a_arr, b_arr;
-    static long result;
+    static int N;
+    static List<Integer>[] adj;
+    static boolean[] visited;
+    static int[][] dp;
 
     private static void input() throws IOException {
         st = new StringTokenizer(br.readLine());
-        T = Integer.parseInt(st.nextToken());
-
-        st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
-        result = 0;
-        a_arr = new int[N];
-        a_sum = new long[N * (N + 1) / 2];
+        visited = new boolean[N + 1];
+        dp = new int[N + 1][2];
 
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < N; i++) {
-            a_arr[i] = Integer.parseInt(st.nextToken());
+        adj = new List[N + 1];
+        for (int i = 0; i <= N; i++) {
+            adj[i] = new ArrayList<>();
         }
 
-        st = new StringTokenizer(br.readLine());
-        M = Integer.parseInt(st.nextToken());
-        b_arr = new int[M];
-        b_sum = new long[M * (M + 1) / 2];
+        for (int i = 0; i < N - 1; i++) {
+            st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
 
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < M; i++) {
-            b_arr[i] = Integer.parseInt(st.nextToken());
+            adj[a].add(b);
+            adj[b].add(a);
         }
     }
 
     private static void pro() throws IOException {
-        make_sum(a_sum, N, a_arr);
-        make_sum(b_sum, M, b_arr);
+        // tree이기 때문에 root는 1이다.
+        recur(1);
 
-        for (int i = 0; i < a_sum.length;) {
-            long a_target = a_sum[i];
-            long b_target = T - a_target;
-
-            long a_term = upper_bound(a_sum, a_target) - lower_bound(a_sum, a_target);
-            long b_term = upper_bound(b_sum, b_target) - lower_bound(b_sum, b_target);
-
-            result += a_term * b_term;
-            i += a_term;
-        }
-
-        // 0도 가능
-        bw.write(result + "");
+        System.out.println(Math.min(dp[1][1], dp[1][0]));
     }
 
-    private static long upper_bound(long[] arr, long target) {
-        int L = 0, R = arr.length - 1;
+    static void recur(int parent) {
+        visited[parent] = true; // 부모 방문 표시
+        dp[parent][0] = 0; // 부모가 얼리가 아니다.
+        dp[parent][1] = 1; // 부모가 얼리일때
 
-        while(L < R) {
-            int mid = L + (R - L) / 2;
+        for (Integer child : adj[parent]) {
+            if (!visited[child]) {
+                recur(child);
 
-            if (target >= arr[mid]) {
-                L = mid + 1;
-            } else {
-                R = mid;
+                // 부모가 얼리가 아니면 자식은 얼리다.
+                dp[parent][0] += dp[child][1];
+                // 부모가 얼리가 맞으면 자식은 얼리 OR 아니다
+                // 그래서 최소의 값을 넣어라.
+                dp[parent][1] += Math.min(dp[child][0], dp[child][1]);
             }
         }
-
-        return L;
-    }
-
-    private static long lower_bound(long[] arr, long target) {
-        int L = 0, R = arr.length - 1;
-
-        while(L < R) {
-            int mid = L + (R - L) / 2;
-
-            if (target <= arr[mid]) {
-                R = mid;
-            } else {
-                L = mid + 1;
-            }
-        }
-
-        return L;
-    }
-
-    private static void make_sum( long[] sum,  int n,  int[] arr) {
-        int idx = 0;
-
-        for (int i = 0; i < n; i++) {
-            int temp = 0;
-
-            for (int j = i; j < n; j++) {
-                temp += arr[j];
-                sum[idx++] = temp;
-            }
-        }
-
-        Arrays.sort(sum);
     }
 
     public static void main(String[] args) throws IOException {
