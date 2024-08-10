@@ -152,6 +152,7 @@ public class Main {
             Info nowCloud = q.poll();
             int nx = nowCloud.x; int ny = nowCloud.y;
 
+            
             // 이동
             for (int j = 0; j < num; j++) {
                 nx +=  dirs[dir][0];
