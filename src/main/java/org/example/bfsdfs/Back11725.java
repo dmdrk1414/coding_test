@@ -6,71 +6,72 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class back4963 {
+public class Back11725 {
 
   static FastReader scan = new FastReader();
   static StringBuilder sb = new StringBuilder();
 
-  static int N, M;
-  static int[][] a;
-  static boolean[][] visit;
-  static int[][] dir = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+  static int N;
+  static int[] parent;
+  static ArrayList<Integer>[] adj;
+  static boolean[] visit;
 
   static void input() {
-    M = scan.nextInt(); // w
-    N = scan.nextInt(); // h
-    a = new int[N][M];
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < M; j++) {
-        a[i][j] = scan.nextInt();
-      }
+    N = scan.nextInt();
+    adj = new ArrayList[N + 1];
+    parent = new int[N + 1];
+    for (int i = 1; i <= N; i++) {
+      adj[i] = new ArrayList<>();
     }
-    visit = new boolean[N][M];
+    for (int i = 0; i < N - 1; i++) {
+      int x = scan.nextInt(), y = scan.nextInt();
+      adj[x].add(y);
+      adj[y].add(x);
+    }
   }
 
-  // x, y 를 갈 수 있다는 걸 알고 방문한 상태
-  static void dfs(int x, int y) {
-    visit[x][y] = true;
-    for (int k = 0; k < 8; k++) {
-      int nx = x + dir[k][0];
-      int ny = y + dir[k][1];
-      if (nx < 0 || ny < 0 || nx >= N || ny >= M) {
-        continue;  // 지도를 벗어나는 곳으로 가는가?
+  // start 에서 시작해서 갈 수 있는 정점들을 모두 탐색하기
+  static void bfs(int start) {
+    Queue<Integer> que = new LinkedList<>();
+
+    // start는 방문 가능한 점이므로 que에 넣어준다.
+    que.add(start);
+    visit[start] = true;  // start를 갈 수 있다고 표시하기 (중요!!!)
+
+    while (!que.isEmpty()) {  // 더 확인할 점이 없다면 정지
+      int x = que.poll();
+
+      for (int y : adj[x]) {
+        if (visit[y]) {
+          continue;  // x 에서 y 를 갈 수는 있지만, 이미 탐색한 점이면 무시
+        }
+
+        // y를 갈 수 있으니까 que에 추가하고, visit 처리 하기!
+        que.add(y);
+        parent[y] = x;
+        visit[y] = true;
       }
-      if (a[nx][ny] == 0) {
-        continue;  // 갈 수 있는 칸인지 확인해야 한다.
-      }
-      if (visit[nx][ny]) {
-        continue;  // 이미 방문한 적이 있는 곳인가?
-      }
-      dfs(nx, ny);
     }
   }
 
   static void pro() {
+    visit = new boolean[N + 1];
+    bfs(1);
     int ans = 0;
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < M; j++) {
-        if (!visit[i][j] && a[i][j] == 1) {
-          ans++;
-          dfs(i, j);
-        }
-      }
+    for (int i = 2; i <= N; i++) {
+      sb.append(parent[i]).append('\n');
     }
-
-    System.out.println(ans);
+    System.out.println(sb);
   }
 
   public static void main(String[] args) {
-    while (true) {
-      input();
-      if (N == 0 && M == 0) {
-        break;
-      }
-      pro();
-    }
+    input();
+    pro();
   }
 
 
@@ -95,7 +96,6 @@ public class back4963 {
           e.printStackTrace();
         }
       }
-
       return st.nextToken();
     }
 
