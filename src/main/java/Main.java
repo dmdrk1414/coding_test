@@ -24,6 +24,7 @@ public class Main {
 
     private static void pro() throws IOException {
         totalProRec();
+        
     }
 
     public static void main(String[] args) throws IOException {
