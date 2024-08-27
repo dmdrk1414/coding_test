@@ -37,7 +37,6 @@ import java.util.*;
 
 
 
-
  5
  -5 -15
  30 40
