@@ -17,7 +17,6 @@ public class Main {
                 M[i][j] = sc.nextInt();  // 돌고래 i가 시간 j에 묘기
             }
         }
-
         int cnt = 0;
 
         for (int t = 1; t <= K; t++) {
