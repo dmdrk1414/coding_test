@@ -18,7 +18,6 @@ public class Main {
             }
         }
         int cnt = 0;
-
         for (int t = 1; t <= K; t++) {
             for (int i = 1; i <= N; i++) {
                 if (M[i][t] == 1 && !photographed[i]) {  // 돌고래 i가 t시간 묘기를 && 촬영 XX
