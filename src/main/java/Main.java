@@ -24,7 +24,6 @@ public class Main {
                     if (!camera[i]) {  // 아직 카메라가 설치되지 않은 서식지라면
                         camera[i] = true;  // 카메라 설치
                         i--;
-                        
                     } else {
                         photographed[i] = true;  // 돌고래 촬영
                         cnt++;
